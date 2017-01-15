@@ -1,24 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ConnectWindow</class>
- <widget class="QMainWindow" name="ConnectWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="ConnectWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>681</width>
+    <height>324</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>ConnectWindow</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="2">
+     <widget class="QLabel" name="lbColon">
+      <property name="text">
+       <string>:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QPlainTextEdit" name="tEditPort">
+      <property name="inputMethodHints">
+       <set>Qt::ImhNone</set>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QPlainTextEdit" name="tEditHost">
+      <property name="inputMethodHints">
+       <set>Qt::ImhUrlCharactersOnly</set>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="lbHost">
+      <property name="text">
+       <string>Hoszt és Port:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4" rowspan="6">
+     <widget class="QListWidget" name="lwConnections"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="lbService">
+      <property name="text">
+       <string>SSID:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="4">
+     <widget class="QPlainTextEdit" name="tEditService">
+      <property name="inputMethodHints">
+       <set>Qt::ImhNone</set>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QPushButton" name="pbSave">
+      <property name="text">
+       <string>Mentés</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1" colspan="3">
+     <widget class="QPushButton" name="pbConnect">
+      <property name="text">
+       <string>Kapcsolódás</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QPlainTextEdit" name="tEditUsername">
+      <property name="inputMethodHints">
+       <set>Qt::ImhNone</set>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1" colspan="3">
+     <widget class="QPlainTextEdit" name="tEditPassword">
+      <property name="inputMethodHints">
+       <set>Qt::ImhSensitiveData</set>
+      </property>
+      <property name="documentTitle">
+       <string>a</string>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="lbUsername">
+      <property name="text">
+       <string>Felhasználónév:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="lbPassword">
+      <property name="text">
+       <string>Jelszó:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QLabel" name="lbConnections">
+      <property name="text">
+       <string>Mentett kapcsolatok:</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>
