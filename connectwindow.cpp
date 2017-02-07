@@ -17,7 +17,6 @@
 ConnectWindow::ConnectWindow(QWidget *parent) :
     QMainWindow(parent)
     , ui(new Ui::ConnectWindow)
-    , i(0)
 {
     ui->setupUi(this);
 	loadConnections();
@@ -51,22 +50,21 @@ void ConnectWindow::loadConnections()
 void ConnectWindow::on_pbConnect_clicked()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QOCI");
-    db.setHostName("eszakigrid97@aramis.inf.elte.hu");
-    db.setPort(1521);
-    //db.setDatabaseName("customdb");
-    db.setUserName("A8UZ7T");
-    db.setPassword("fTzg35!");
-    bool ok = db.open();
-    if (ok)
+    db.setHostName (ui->lEHost->text());
+    db.setDatabaseName (ui->lEService->text());
+    db.setPort (ui->lEPort->text().toInt());
+    if ( Q_LIKELY(db.open(ui->lEUsername->text()
+		, ui->lEPassword->text())) )
     {
-        QMessageBox popup;
-        popup.setText("OK");
-        popup.exec();
+		this->close();
+		this->destroy();
     } else {
+
         QMessageBox popup;
         popup.setText(db.lastError().text());
         popup.exec();
     }
+	db.close();
 }
 
 void ConnectWindow::on_lwConnections_itemClicked(QListWidgetItem *item)
@@ -89,25 +87,25 @@ void ConnectWindow::on_lwConnections_itemClicked(QListWidgetItem *item)
 				{
 					xmlReader.readNext();
 					QString port = xmlReader.text().toString();
-					ui->tEditPort->setPlainText(port);
+					ui->lEPort->setText(port);
 				}
 				else if (tagname.compare("host") == 0)
 				{
 					xmlReader.readNext();
 					QString host = xmlReader.text().toString();
-					ui->tEditHost->setPlainText(host);
+					ui->lEHost->setText(host);
 				}
 				else if (tagname.compare("username") == 0)
 				{
 					xmlReader.readNext();
 					QString username = xmlReader.text().toString();
-					ui->tEditUsername->setPlainText(username);
+					ui->lEUsername->setText(username);
 				}
 				else if (tagname.compare("service") == 0)
 				{
 					xmlReader.readNext();
 					QString service = xmlReader.text().toString();
-					ui->tEditService->setPlainText(service);
+					ui->lEService->setText(service);
 				}
 			}
 			xmlReader.readNext();
@@ -143,10 +141,10 @@ void ConnectWindow::on_pbSave_clicked()
 		stream.writeStartDocument();
 		stream.writeStartElement("Connection");
 		stream.writeAttribute("name", title);
-		stream.writeTextElement("host", ui->tEditHost->toPlainText());
-		stream.writeTextElement("port", ui->tEditPort->toPlainText());
-		stream.writeTextElement("service", ui->tEditService->toPlainText());
-		stream.writeTextElement("username", ui->tEditUsername->toPlainText());
+		stream.writeTextElement("host", ui->lEHost->text());
+		stream.writeTextElement("port", ui->lEPort->text());
+		stream.writeTextElement("service", ui->lEService->text());
+		stream.writeTextElement("username", ui->lEUsername->text());
 		stream.writeEndElement();
 		stream.writeEndDocument();
 		loadConnections();

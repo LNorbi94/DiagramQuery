@@ -28,7 +28,6 @@ private slots:
 
 private:
     Ui::ConnectWindow *ui;
-    size_t i;
 };
 
 #endif // CONNECTWINDOW_H
