@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Connection name="Test">
-    <host>aramis.inf.elte.hu</host>
-    <port>1521</port>
-    <service>eszakigrid97</service>
-    <username>A8UZ7T</username>
-</Connection>

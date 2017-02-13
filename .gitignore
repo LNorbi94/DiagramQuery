@@ -10,7 +10,7 @@
 *.dll
 *.dylib
 
-# Qt-es
+# Qt
 
 /.qmake.cache
 /.qmake.stash
@@ -28,6 +28,7 @@ Makefile*
 # QtCreator
 
 *.autosave
+*.pro.user
 
 # QtCtreator Qml
 *.qmlproject.user
@@ -36,6 +37,5 @@ Makefile*
 # QtCtreator CMake
 CMakeLists.txt.user
 
-# Project files
-/debug
-/x64
+# Project
+/Build/*
