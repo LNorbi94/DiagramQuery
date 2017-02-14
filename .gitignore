@@ -39,3 +39,15 @@ CMakeLists.txt.user
 
 # Project
 /Build/*
+
+# Visual Studio Files
+*.vcxproj.*
+*.vcxproj
+/Implementation/.vs/*
+/Implementation/Debug/*
+/Implementation/GeneratedFiles/*
+/Implementation/Release/*
+/Implementation/x64/*
+
+# Config files
+/Implementation/Connections/*

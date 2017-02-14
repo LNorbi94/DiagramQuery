@@ -9,9 +9,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    //ConnectWindow * w = new ConnectWindow();
-    //w->show();
-    MainWindow * wa = new MainWindow(nullptr);
-    wa->show();
+    ConnectWindow * w = new ConnectWindow();
+    w->show();
     return a.exec();
 }

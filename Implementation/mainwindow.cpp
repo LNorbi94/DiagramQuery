@@ -1,34 +1,17 @@
 #include "Headers/mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "Headers/constants.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget * parent) :
     QMainWindow(parent)
   , ui(new Ui::MainWindow)
   , db(nullptr)
 {
-    ui->setupUi(this);
-    QList<int> sizes;
-    sizes << 150 << 600;
-    ui->mainSplitter->setSizes(sizes);
-    sizes.clear();
-    sizes << 400 << 200;
-    ui->splitter->setSizes(sizes);
-    ui->treeWidget->setHeaderLabel("aramis.inf.elte.hu");
-    ui->treeWidget->setColumnCount(1);
-    QList<QTreeWidgetItem *> items;
-    QTreeWidgetItem * table = new QTreeWidgetItem(QStringList("Táblák"));
-    items.append(table);
-    items.append(new QTreeWidgetItem(QStringList("Indexek")));
-    items.append(new QTreeWidgetItem(QStringList("Nézetek")));
-    items.append(new QTreeWidgetItem(QStringList("Metódusok")));
-    items.append(new QTreeWidgetItem(QStringList("Függvények")));
-    ui->treeWidget->insertTopLevelItems(0, items);
-    table->insertChildren(0, items);
-    table->setFirstColumnSpanned(true);
+	Q_ASSERT(db);
 }
 
-MainWindow::MainWindow(QSqlDatabase * db, QWidget *parent = nullptr) :
+MainWindow::MainWindow(QWidget * parent, QSqlDatabase * db) :
     QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , db(db)
@@ -40,12 +23,25 @@ MainWindow::MainWindow(QSqlDatabase * db, QWidget *parent = nullptr) :
     QString dbName = db->databaseName();
     ui->statusBar->showMessage(dbName);
     QList<int> sizes;
-    sizes << 100 << 600;
-    ui->mainSplitter->setSizes(sizes);
+	sizes << 150 << 600;
+	ui->mainSplitter->setSizes(sizes);
+	sizes.clear();
+	sizes << 400 << 200;
+	ui->splitter->setSizes(sizes);
     ui->treeWidget->setColumnCount(1);
     QList<QTreeWidgetItem *> items;
-    for (int i = 0; i < 10; ++i)
-        items.append(new QTreeWidgetItem((QTreeWidget*)0, QStringList(QString("item: %1").arg(i))));
+	QTreeWidgetItem * tables = new QTreeWidgetItem(QStringList("Táblák"));
+	QTreeWidgetItem * indexes = new QTreeWidgetItem(QStringList("Indexek"));
+	QTreeWidgetItem * views = new QTreeWidgetItem(QStringList("Nézetek"));
+	QTreeWidgetItem * functions = new QTreeWidgetItem(QStringList("Függvények"));
+	items.append(tables);
+	items.append(indexes);
+	items.append(views);
+	items.append(functions);
+	fillTableList(tables);
+	fillIndexList(indexes);
+	fillViewList(views);
+	fillFunctionList(functions);
     ui->treeWidget->insertTopLevelItems(0, items);
     ui->treeWidget->setHeaderLabel(db->hostName());
 }
@@ -54,12 +50,55 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-/*
-void MainWindow::on_tabWidget_tabCloseRequested(int index)
+
+//void MainWindow::on_tabWidget_tabCloseRequested(int index)
+//{
+//    //delete ui->tabWidget->widget(index);
+//}
+
+
+bool MainWindow::fillList(QTreeWidgetItem * list, QSqlQuery * query)
 {
-    //delete ui->tabWidget->widget(index);
+	QList<QTreeWidgetItem *> tableItems;
+	if (!query->isActive())
+	{
+		return false;
+	}
+	while (query->next())
+	{
+		tableItems.append(new QTreeWidgetItem(QStringList(query->value(0).toString())));
+	}
+	list->insertChildren(0, tableItems);
+	return true;
 }
-*/
+
+bool MainWindow::fillTableList(QTreeWidgetItem * table)
+{
+	QSqlQuery query;
+	query.exec(queries::GETTABLES);
+	return fillList(table, &query);
+}
+
+bool MainWindow::fillIndexList(QTreeWidgetItem * index)
+{
+	QSqlQuery query;
+	query.exec(queries::GETINDEXES);
+	return fillList(index, &query);
+}
+
+bool MainWindow::fillViewList(QTreeWidgetItem * view)
+{
+	QSqlQuery query;
+	query.exec(queries::GETVIEWS);
+	return fillList(view, &query);
+}
+
+bool MainWindow::fillFunctionList(QTreeWidgetItem * function)
+{
+	QSqlQuery query;
+	query.exec(queries::GETFUNCTIONS);
+	return fillList(function, &query);
+}
 
 void MainWindow::on_actionKil_p_s_triggered()
 {

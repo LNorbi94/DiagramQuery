@@ -42,11 +42,11 @@ void ConnectWindow::fillConnectionList()
 		dir.setNameFilters(filters);
 
 		QFileInfoList list = dir.entryInfoList();
-        QStringRef connectionName;
+        QString connectionName;
 		for (int i = 0; i < list.size(); ++i)
 		{
-            connectionName = &list.at(i).baseName();
-            ui->lwConnections->addItem(connectionName.toString());
+            connectionName = list.at(i).baseName();
+            ui->lwConnections->addItem(connectionName);
 		}
 	}
 }
@@ -59,17 +59,18 @@ void ConnectWindow::on_pbConnect_clicked()
     db.setDatabaseName(ui->lEService->text());
     db.setPort(ui->lEPort->text().toInt());
     if ( Q_LIKELY(db.open(ui->lEUsername->text()
-						, ui->lEPassword->text())) )
+						, /*ui->lEPassword->text()*/"fTzg35!")) )
     {
-        MainWindow * wa = new MainWindow(&db, nullptr);
+        MainWindow * wa = new MainWindow(nullptr, &db);
         wa->show();
 		this->close();
         this->destroy();
     } else
 	{
-        QMessageBox popup;
-        popup.setText(db.lastError().text());
-        popup.exec();
+		QMessageBox::critical(
+			this,
+			tr("Hiba történt kapcsolódás közben!"),
+			db.lastError().text());
     }
 	db.close();
 }
@@ -137,23 +138,43 @@ void ConnectWindow::on_pbSave_clicked()
 		}
 		QString filename = connections::CONFIGFOLDER;
 		QString connectionName = input.textValue();
-		filename.append("\\");
-		filename.append(connectionName);
-		filename.append(".xml");
-		QFile file(filename);
-		file.open(QIODevice::WriteOnly);
-		QXmlStreamWriter stream(&file);
-		stream.setAutoFormatting(true);
-		stream.writeStartDocument();
-		stream.writeStartElement("Connection");
-		stream.writeAttribute("name", connectionName);
-		stream.writeTextElement("host", ui->lEHost->text());
-		stream.writeTextElement("port", ui->lEPort->text());
-		stream.writeTextElement("service", ui->lEService->text());
-		stream.writeTextElement("username", ui->lEUsername->text());
-		stream.writeEndElement();
-		stream.writeEndDocument();
-        fillConnectionList();
+		if (connectionName.isEmpty())
+		{
+			QMessageBox::warning(
+				this,
+				tr("Név megadása"),
+				tr("Kérem adjon meg egy nevet, amivel később majd el lehet érni a kapcsolatot!"));
+		}
+		else
+		{
+			filename.append(QDir::separator());
+			filename.append(connectionName);
+			filename.append(".xml");
+			QFile file(filename);
+			if (file.exists())
+			{
+				QMessageBox::warning(
+					this,
+					tr("Létező név"),
+					tr("Már létezik kapcsolat ilyen névvel! Kérem adjon meg más nevet."));
+			}
+			else {
+				file.open(QIODevice::WriteOnly);
+				QXmlStreamWriter stream(&file);
+				stream.setAutoFormatting(true);
+				stream.writeStartDocument();
+				stream.writeStartElement("Connection");
+				stream.writeAttribute("name", connectionName);
+				stream.writeTextElement("host", ui->lEHost->text());
+				stream.writeTextElement("port", ui->lEPort->text());
+				stream.writeTextElement("service", ui->lEService->text());
+				stream.writeTextElement("username", ui->lEUsername->text());
+				stream.writeEndElement();
+				stream.writeEndDocument();
+				fillConnectionList();
+
+			}
+		}
 	}
 }
 
