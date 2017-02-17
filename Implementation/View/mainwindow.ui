@@ -75,6 +75,9 @@
    <property name="text">
     <string>Kilépés</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
  </widget>
  <resources/>

@@ -63,11 +63,11 @@ bool MainWindow::fillList(QTreeWidgetItem * list, QSqlQuery * query)
 	if (!query->isActive())
 	{
 		return false;
-	}
+    }
 	while (query->next())
 	{
 		tableItems.append(new QTreeWidgetItem(QStringList(query->value(0).toString())));
-	}
+    }
 	list->insertChildren(0, tableItems);
 	return true;
 }

@@ -59,7 +59,7 @@ void ConnectWindow::on_pbConnect_clicked()
     db.setDatabaseName(ui->lEService->text());
     db.setPort(ui->lEPort->text().toInt());
     if ( Q_LIKELY(db.open(ui->lEUsername->text()
-						, /*ui->lEPassword->text()*/"fTzg35!")) )
+                        , ui->lEPassword->text())) )
     {
         MainWindow * wa = new MainWindow(nullptr, &db);
         wa->show();
