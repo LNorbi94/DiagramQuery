@@ -22,7 +22,7 @@ public:
 private slots:
     void on_pbConnect_clicked();
 
-    void on_lwConnections_itemClicked(QListWidgetItem *item);
+    void on_lwConnections_itemDoubleClicked(QListWidgetItem *item);
 
 	void on_pbSave_clicked();
 

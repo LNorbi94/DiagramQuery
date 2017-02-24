@@ -10,7 +10,7 @@ namespace connections
 
 namespace queries
 {
-    const QString GETTABLES = "SELECT object_name FROM user_objects \
+    const QString GETTABLES = "SELECT object_name FROM dba_objects \
         WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";
     const QString GETINDEXES = "SELECT object_name FROM user_objects \
         WHERE object_type = 'INDEX' AND object_name NOT LIKE '%$%'";

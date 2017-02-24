@@ -14,6 +14,8 @@
 #include <QMessageBox>
 #include <QListWidgetItem>
 
+#include <cryptopp/base64.h>
+
 ConnectWindow::ConnectWindow(QWidget *parent) :
     QMainWindow(parent)
     , ui(new Ui::ConnectWindow)
@@ -54,14 +56,14 @@ void ConnectWindow::fillConnectionList()
 
 void ConnectWindow::on_pbConnect_clicked()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QOCI");
-    db.setHostName(ui->lEHost->text());
-    db.setDatabaseName(ui->lEService->text());
-    db.setPort(ui->lEPort->text().toInt());
-    if ( Q_LIKELY(db.open(ui->lEUsername->text()
+    QSqlDatabase* db = new QSqlDatabase(QSqlDatabase::addDatabase("QOCI"));
+    db->setHostName(ui->lEHost->text());
+    db->setDatabaseName(ui->lEService->text());
+    db->setPort(ui->lEPort->text().toInt());
+    if ( Q_LIKELY(db->open(ui->lEUsername->text()
                         , ui->lEPassword->text())) )
     {
-        MainWindow * wa = new MainWindow(nullptr, &db);
+        MainWindow * wa = new MainWindow(nullptr, *db);
         wa->show();
 		this->close();
         this->destroy();
@@ -70,12 +72,12 @@ void ConnectWindow::on_pbConnect_clicked()
 		QMessageBox::critical(
 			this,
 			tr("Hiba történt kapcsolódás közben!"),
-			db.lastError().text());
+			db->lastError().text());
     }
-	db.close();
+	//db->close();
 }
 
-void ConnectWindow::on_lwConnections_itemClicked(QListWidgetItem *item)
+void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem *item)
 {
 	QString filename = connections::CONFIGFOLDER;
 	filename.append("\\");
@@ -115,6 +117,11 @@ void ConnectWindow::on_lwConnections_itemClicked(QListWidgetItem *item)
 					QStringRef service = xmlReader.text();
 					ui->lEService->setText(service.toString());
 				}
+                else if (0 == tagname.compare("password"))
+                {
+                    xmlReader.readNext();
+                    // TODO
+                }
 			}
 			xmlReader.readNext();
 		}
@@ -138,7 +145,7 @@ void ConnectWindow::on_pbSave_clicked()
 		}
 		QString filename = connections::CONFIGFOLDER;
 		QString connectionName = input.textValue();
-		if (connectionName.isEmpty())
+		if ( Q_UNLIKELY(connectionName.isEmpty()) )
 		{
 			QMessageBox::warning(
 				this,
@@ -151,14 +158,15 @@ void ConnectWindow::on_pbSave_clicked()
 			filename.append(connectionName);
 			filename.append(".xml");
 			QFile file(filename);
-			if (file.exists())
+			if ( Q_UNLIKELY(file.exists()) )
 			{
 				QMessageBox::warning(
 					this,
 					tr("Létező név"),
 					tr("Már létezik kapcsolat ilyen névvel! Kérem adjon meg más nevet."));
 			}
-			else {
+			else
+			{
 				file.open(QIODevice::WriteOnly);
 				QXmlStreamWriter stream(&file);
 				stream.setAutoFormatting(true);
@@ -169,12 +177,26 @@ void ConnectWindow::on_pbSave_clicked()
 				stream.writeTextElement("port", ui->lEPort->text());
 				stream.writeTextElement("service", ui->lEService->text());
 				stream.writeTextElement("username", ui->lEUsername->text());
+				if (ui->rbSavePassword->isChecked())
+                {
+                    //encryption.addData(ui->lEPassword->text().toLatin1());
+                    // TODO
+					//byte const* pbData = ui->lEPassword->text();
+					//unsigned int nDataLen = ...;
+
+					//// Encode with line breaks (default).
+					//// Ordinarily, we would now have to call MessageEnd() to flush
+					//// Base64Encoder's buffer. However, the 'true' parameter will cause
+					//// the StringSource::PumpAll() method to be called, and that method
+					//// will cause MessageEnd() to be triggered implicitly.
+					//StringSource(pbData, nDataLen, true,
+					//	new Base64Encoder(
+					//		new FileSink("base64-encoded.dat")));
+				}
 				stream.writeEndElement();
 				stream.writeEndDocument();
 				fillConnectionList();
-
 			}
 		}
 	}
 }
-
