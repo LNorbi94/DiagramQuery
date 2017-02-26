@@ -63,7 +63,7 @@ void ConnectWindow::on_pbConnect_clicked()
     if ( Q_LIKELY(db->open(ui->lEUsername->text()
                         , ui->lEPassword->text())) )
     {
-        MainWindow * wa = new MainWindow(nullptr, *db);
+        MainWindow * wa = new MainWindow(*db);
         wa->show();
 		this->close();
         this->destroy();

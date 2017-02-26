@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>681</width>
-    <height>180</height>
+    <height>182</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -159,6 +159,17 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lEHost</tabstop>
+  <tabstop>lEPort</tabstop>
+  <tabstop>lEService</tabstop>
+  <tabstop>lEUsername</tabstop>
+  <tabstop>lEPassword</tabstop>
+  <tabstop>pbConnect</tabstop>
+  <tabstop>pbSave</tabstop>
+  <tabstop>rbSavePassword</tabstop>
+  <tabstop>lwConnections</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

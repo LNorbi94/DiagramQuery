@@ -5,106 +5,101 @@
 
 #include "Headers/constants.h"
 
-MainWindow::MainWindow(QWidget * parent, QSqlDatabase& db) :
+MainWindow::MainWindow(QSqlDatabase& db, QWidget * parent) :
     QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , db(db)
+	, logger(*new QPlainTextEdit)
 {
-    ui->setupUi(this);
-    /*QWidget *newTab = new QWidget(ui->tabWidget);
-    ui->tabWidget->addTab(newTab, tr("name"));
-    ui->tabWidget->addTab(new QWidget(ui->tabWidget), tr("name"));*/
-    QString dbName = db.databaseName();
-    //ui->statusBar->showMessage(dbName);
-    QList<int> sizes;
-	sizes << 150 << 600;
-	ui->mainSplitter->setSizes(sizes);
-	sizes.clear();
-	sizes << 400 << 200;
-	ui->splitter->setSizes(sizes);
-    ui->treeWidget->setColumnCount(1);
+	ui->setupUi(this);
+
+	progressBar = new QProgressBar(ui->statusBar);
+	progressBar->setRange(0, 100);
+    progressBar->setValue(0);
+	progressBar->setMaximumSize(150, 18);
+
+	ui->mainSplitter->setSizes({ 150, 600 });
+	ui->splitter->setSizes({ 400, 200 });
+
+    QTextEdit *newTab = new QTextEdit(ui->tWUpper);
+    QString dbName = db.hostName();
+	ui->tWUpper->addTab(newTab, dbName);
+
+	QTreeWidget * treeWidget = ui->trWLeft;
+    treeWidget->setColumnCount(1);
     QList<QTreeWidgetItem *> items;
-    QTreeWidgetItem * tables = new QTreeWidgetItem(QStringList("Táblák"));
-    QTreeWidgetItem * indexes = new QTreeWidgetItem(QStringList("Indexek"));
-    QTreeWidgetItem * views = new QTreeWidgetItem(QStringList("Nézetek"));
-    QTreeWidgetItem * functions = new QTreeWidgetItem(QStringList("Függvények"));
+    QTreeWidgetItem * tables = new QTreeWidgetItem(QStringList(queries::TABLES));
+    QTreeWidgetItem * indexes = new QTreeWidgetItem(QStringList(queries::INDEXES));
+    QTreeWidgetItem * views = new QTreeWidgetItem(QStringList(queries::VIEWS));
+    QTreeWidgetItem * functions = new QTreeWidgetItem(QStringList(queries::FUNCTIONS));
 	items.append(tables);
 	items.append(indexes);
 	items.append(views);
     items.append(functions);
-    fillIndexList(indexes);
-    fillViewList(views);
-    fillFunctionList(functions);
-    ui->treeWidget->insertTopLevelItems(0, items);
-    ui->treeWidget->setHeaderLabel(db.hostName());
-    progressBar = new QProgressBar(ui->statusBar);
-    progressBar->setRange(0, 100);
-    progressBar->setValue(0);
-    progressBar->setMaximumSize(150, 18);
+    treeWidget->insertTopLevelItems(0, items);
+    treeWidget->setHeaderLabel(dbName);
     ui->statusBar->addPermanentWidget(progressBar, 0);
+
+	ui->tWLower->addTab(&logger, "Adatbázis log");
+	logger.setReadOnly(true);
+	logger.appendPlainText(QString("[%1] Sikeresen csatlakozva az adatbázishoz!").arg(QTime::currentTime().toString()));
+
+	ui->tWLower->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete progressBar;
 }
 
-//void MainWindow::on_tabWidget_tabCloseRequested(int index)
-//{
-//    //delete ui->tabWidget->widget(index);
-//}
 
-
-bool MainWindow::fillList(QTreeWidgetItem * list, QSqlQuery& query)
+bool MainWindow::fillList(QTreeWidgetItem * list, QSqlQuery& query, int tableSize)
 {
-	QList<QTreeWidgetItem *> tableItems;
     if (!query.isActive())
-	{
-		std::cerr << "bla";
+    {
 		return false;
     }
-	std::cerr << query.size();
-    for (int i = 0; i < query.numRowsAffected(); ++i)
+    for (int i = 0; i < tableSize; ++i)
     {
         query.next();
-        tableItems.append(new QTreeWidgetItem(QStringList(query.value(0).toString())));
-        progressBar->setValue(query.size() / (i + 1));
-		std::cerr << "bla";
+        list->insertChild(0, new QTreeWidgetItem(
+                              QStringList(query.value(0).toString())
+                              )
+                          );
+        progressBar->setValue((i + 1.0) / tableSize * 100);
     }
-	std::cerr << "bla";
-//    while (query.next())
-//	{
-//        tableItems.append(new QTreeWidgetItem(QStringList(query.value(0).toString())));
-//    }
-    list->insertChildren(0, tableItems);
+	progressBar->setValue(0);
 	return true;
 }
 
 bool MainWindow::fillTableList(QTreeWidgetItem * table)
 {
-                         //query.exec(queries::GETTABLES);
-    QSqlQuery query = db.exec(queries::GETTABLES);
-    return fillList(table, query);
+    QSqlQuery query = db.exec(queries::GET_TABLES_COUNT);
+    query.next();
+    int tableSize = query.value(0).toInt();
+    query = db.exec(queries::GET_TABLES);;
+    return fillList(table, query, tableSize);
 }
 
 bool MainWindow::fillIndexList(QTreeWidgetItem * index)
 {
 	QSqlQuery query;
-	query.exec(queries::GETINDEXES);
+	query.exec(queries::GET_INDEXES);
     return fillList(index, query);
 }
 
 bool MainWindow::fillViewList(QTreeWidgetItem * view)
 {
 	QSqlQuery query;
-	query.exec(queries::GETVIEWS);
+	query.exec(queries::GET_VIEWS);
     return fillList(view, query);
 }
 
 bool MainWindow::fillFunctionList(QTreeWidgetItem * function)
 {
 	QSqlQuery query;
-	query.exec(queries::GETFUNCTIONS);
+	query.exec(queries::GET_FUNCTIONS);
     return fillList(function, query);
 }
 
@@ -114,7 +109,54 @@ void MainWindow::on_actionKil_p_s_triggered()
     this->destroy();
 }
 
-void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int /*column*/)
+void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem *item, int /*column*/)
 {
-    fillTableList(item);
+	QElapsedTimer timer;
+	if (item->childCount() < 1)
+	{
+		bool success;
+		int elapsedTime;
+		if (queries::TABLES == item->text(0))
+		{
+			timer.start();
+			success = fillTableList(item);
+			elapsedTime = timer.elapsed();
+		}
+		else if (queries::INDEXES == item->text(0))
+		{
+			timer.start();
+			success = fillIndexList(item);
+			elapsedTime = timer.elapsed();
+		}
+		else if (queries::VIEWS == item->text(0))
+		{
+			timer.start();
+			success = fillViewList(item);
+			elapsedTime = timer.elapsed();
+		}
+		else if (queries::FUNCTIONS == item->text(0))
+		{
+			timer.start();
+			success = fillFunctionList(item);
+			elapsedTime = timer.elapsed();
+		}
+		if (success)
+		{
+			logger.appendPlainText(QString("[%1] Adatbázisban található objektumok sikeresen lekérdezve %2 ms alatt.").arg(QTime::currentTime().toString()).arg(elapsedTime));
+		}
+		else
+		{
+			logger.appendPlainText("Hiba történt a lekérdezés végrehajtása közben!");
+		}
+	}
+}
+
+void MainWindow::on_tWUpper_tabCloseRequested(int index)
+{
+	delete ui->tWUpper->widget(index);
+}
+
+void MainWindow::on_tWLower_tabCloseRequested(int index)
+{
+	delete ui->tWLower->widget(index);
 }

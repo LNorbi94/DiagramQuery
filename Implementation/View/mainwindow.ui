@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>756</width>
-    <height>487</height>
+    <width>1024</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>QueryCreator</string>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -35,7 +35,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTreeWidget" name="treeWidget">
+      <widget class="QTreeWidget" name="trWLeft">
        <column>
         <property name="text">
          <string notr="true">1</string>
@@ -46,26 +46,42 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QListView" name="listView"/>
-       <widget class="QTextEdit" name="textEdit"/>
+       <widget class="QTabWidget" name="tWUpper">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+        <property name="tabsClosable">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QTabWidget" name="tWLower">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+        <property name="tabsClosable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>756</width>
-     <height>20</height>
+     <width>1024</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuF_jl">
     <property name="title">
      <string>Fájl</string>
     </property>
+    <addaction name="action_j_lap"/>
+    <addaction name="separator"/>
     <addaction name="actionKil_p_s"/>
    </widget>
    <addaction name="menuF_jl"/>
@@ -77,6 +93,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_j_lap">
+   <property name="text">
+    <string>Új lap</string>
    </property>
   </action>
  </widget>

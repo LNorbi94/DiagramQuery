@@ -10,13 +10,28 @@ namespace connections
 
 namespace queries
 {
-    const QString GETTABLES = "SELECT object_name FROM dba_objects \
+	const QString TABLES = QString::fromLatin1("Táblák");
+    const QString GET_TABLES = "SELECT object_name FROM user_objects \
         WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";
-    const QString GETINDEXES = "SELECT object_name FROM user_objects \
+    const QString GET_TABLES_COUNT = "SELECT COUNT(*) FROM user_objects \
+        WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";
+
+	const QString INDEXES = QString::fromLatin1("Indexek");
+    const QString GET_INDEXES = "SELECT object_name FROM user_objects \
         WHERE object_type = 'INDEX' AND object_name NOT LIKE '%$%'";
-    const QString GETVIEWS = "SELECT object_name FROM user_objects \
+	const QString GET_INDEXES_COUNT = "SELECT COUNT(*) FROM user_objects \
+        WHERE object_type = 'INDEX' AND object_name NOT LIKE '%$%'";
+
+	const QString VIEWS = QString::fromLatin1("Nézetek");
+    const QString GET_VIEWS = "SELECT object_name FROM dba_objects \
         WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
-    const QString GETFUNCTIONS = "SELECT object_name FROM user_objects \
+	const QString GET_VIEWS_COUNT = "SELECT COUNT(*) FROM dba_objects \
+        WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
+
+	const QString FUNCTIONS = QString::fromLatin1("Függvények");
+    const QString GET_FUNCTIONS = "SELECT object_name FROM user_objects \
+        WHERE object_type = 'FUNCTION' AND object_name NOT LIKE '%$%'";
+	const QString GET_FUNCTIONS_COUNT = "SELECT COUNT(*) FROM user_objects \
         WHERE object_type = 'FUNCTION' AND object_name NOT LIKE '%$%'";
 }
 
