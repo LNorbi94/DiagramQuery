@@ -56,6 +56,7 @@ MainWindow::~MainWindow()
 
 bool MainWindow::fillList(QTreeWidgetItem * list, QSqlQuery& query, int tableSize)
 {
+    // TODO: seperate child then replace original in tree
     if (!query.isActive())
     {
 		return false;

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QShortcut>
 
 namespace Ui
 {
@@ -22,7 +23,8 @@ public:
 private slots:
     void on_pbConnect_clicked();
     void on_lwConnections_itemDoubleClicked(QListWidgetItem *item);
-	void on_pbSave_clicked();
+    void on_pbSave_clicked();
+    void deleteConnection();
 
 private:
     Ui::ConnectWindow *ui;

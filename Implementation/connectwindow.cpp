@@ -3,6 +3,7 @@
 #include "Headers/constants.h"
 #include "Headers/mainwindow.h"
 
+#include <iostream>
 #include <fstream>
 #include <QXmlStreamWriter>
 #include <QDir>
@@ -22,6 +23,8 @@ ConnectWindow::ConnectWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     fillConnectionList();
+    QShortcut * shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), ui->lwConnections);
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(deleteConnection()));
 }
 
 ConnectWindow::~ConnectWindow()
@@ -53,6 +56,16 @@ void ConnectWindow::fillConnectionList()
 	}
 }
 
+void ConnectWindow::deleteConnection()
+{
+    QString filename = connections::CONFIGFOLDER;
+    filename.append(QDir::separator());
+    filename.append(ui->lwConnections->currentItem()->text());
+    filename.append(".xml");
+    QFile file(filename);
+    file.remove();
+    delete ui->lwConnections->currentItem();
+}
 
 void ConnectWindow::on_pbConnect_clicked()
 {
@@ -80,10 +93,10 @@ void ConnectWindow::on_pbConnect_clicked()
 void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem *item)
 {
 	QString filename = connections::CONFIGFOLDER;
-	filename.append("\\");
+    filename.append(QDir::separator());
 	filename.append(item->text());
 	filename.append(".xml");
-	QFile file(filename);
+    QFile file(filename);
 	if ( Q_LIKELY(file.open(QIODevice::ReadOnly)) )
 	{
 		QXmlStreamReader xmlReader;
@@ -92,32 +105,35 @@ void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem *item)
 		{
 			if (xmlReader.isStartElement())
 			{
-				QStringRef tagname = xmlReader.name();
-				if (0 == tagname.compare("port"))
-				{
-					xmlReader.readNext();
-					QStringRef port = xmlReader.text();
-					ui->lEPort->setText(port.toString());
-				}
-				else if (0 == tagname.compare("host"))
-				{
-					xmlReader.readNext();
-					QStringRef host = xmlReader.text();
-					ui->lEHost->setText(host.toString());
-				}
-				else if (0 == tagname.compare("username"))
-				{
-					xmlReader.readNext();
-					QStringRef username = xmlReader.text();
-					ui->lEUsername->setText(*username.string());
-				}
-				else if (0 == tagname.compare("service"))
-				{
-					xmlReader.readNext();
-					QStringRef service = xmlReader.text();
-					ui->lEService->setText(service.toString());
-				}
-                else if (0 == tagname.compare("password"))
+                QStringRef tagname = xmlReader.name();
+                if (0 == tagname.compare(tr("port")))
+                {
+                    xmlReader.readNext();
+                    QStringRef port = xmlReader.text();
+                    ui->lEPort->setText(port.isNull() ? "" : port.toString());
+                }
+                else if (0 == tagname.compare(tr("host")))
+                {
+                    xmlReader.readNext();
+                    QStringRef host = xmlReader.text();
+                    if (!host.isNull())
+                        ui->lEHost->setText(host.toString());
+                }
+                else if (0 == tagname.compare(tr("username")))
+                {
+                    xmlReader.readNext();
+                    QStringRef username = xmlReader.text();
+                    if (!username.isNull())
+                        ui->lEUsername->setText(*username.string());
+                }
+                else if (0 == tagname.compare(tr("service")))
+                {
+                    xmlReader.readNext();
+                    QStringRef service = xmlReader.text();
+                    if (!service.isNull())
+                        ui->lEService->setText(service.toString());
+                }
+                else if (0 == tagname.compare(tr("password")))
                 {
                     xmlReader.readNext();
                     // TODO
@@ -173,25 +189,15 @@ void ConnectWindow::on_pbSave_clicked()
 				stream.writeStartDocument();
 				stream.writeStartElement("Connection");
 				stream.writeAttribute("name", connectionName);
-				stream.writeTextElement("host", ui->lEHost->text());
+                QString host = ui->lEHost->text();
+                if (!host.isEmpty())
+                    stream.writeTextElement("host", host);
 				stream.writeTextElement("port", ui->lEPort->text());
 				stream.writeTextElement("service", ui->lEService->text());
 				stream.writeTextElement("username", ui->lEUsername->text());
 				if (ui->rbSavePassword->isChecked())
                 {
-                    //encryption.addData(ui->lEPassword->text().toLatin1());
-                    // TODO
-					//byte const* pbData = ui->lEPassword->text();
-					//unsigned int nDataLen = ...;
-
-					//// Encode with line breaks (default).
-					//// Ordinarily, we would now have to call MessageEnd() to flush
-					//// Base64Encoder's buffer. However, the 'true' parameter will cause
-					//// the StringSource::PumpAll() method to be called, and that method
-					//// will cause MessageEnd() to be triggered implicitly.
-					//StringSource(pbData, nDataLen, true,
-					//	new Base64Encoder(
-					//		new FileSink("base64-encoded.dat")));
+                    /// TODO: find some encryption.
 				}
 				stream.writeEndElement();
 				stream.writeEndDocument();
