@@ -9,6 +9,7 @@
 
 #include <QTextEdit>
 #include <QPlainTextEdit>
+#include <QShortcut>
 
 #include <QTableView>
 #include <QSqlDatabase>
@@ -19,6 +20,10 @@
 #include <QFileSystemModel>
 #include <QElapsedTimer>
 #include <QTime>
+
+#include "sqlhighlighter.hpp"
+#include "Headers/constants.h"
+#include "dblogger.hpp"
 
 namespace Ui
 {
@@ -39,18 +44,20 @@ private slots:
     void on_trWLeft_itemDoubleClicked(QTreeWidgetItem *item, int column);
 	void on_tWUpper_tabCloseRequested(int index);
 	void on_tWLower_tabCloseRequested(int index);
+	void executeQuery();
 
 private:
-    bool fillList(QTreeWidgetItem * item, QSqlQuery& query, int tableSize = 0);
+    bool fillList(QTreeWidgetItem * list, const QString& queryToExecute, const QString& queryCount);
 	bool fillTableList(QTreeWidgetItem * table);
     bool fillIndexList(QTreeWidgetItem * index);
     bool fillViewList(QTreeWidgetItem * view);
     bool fillFunctionList(QTreeWidgetItem * function);
 
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
     QSqlDatabase& db;
-    QProgressBar * progressBar;
-	QPlainTextEdit& logger;
+    QProgressBar* progressBar;
+	DBLogger& logger;
+	QTextEdit* queries;
 };
 
 #endif // MAINWINDOW_H

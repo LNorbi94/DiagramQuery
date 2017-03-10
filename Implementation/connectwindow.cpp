@@ -1,21 +1,5 @@
 #include "Headers/connectwindow.h"
 #include "ui_connectwindow.h"
-#include "Headers/constants.h"
-#include "Headers/mainwindow.h"
-
-#include <iostream>
-#include <fstream>
-#include <QXmlStreamWriter>
-#include <QDir>
-
-#include <QSqlDatabase>
-#include <QSqlError>
-
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QListWidgetItem>
-
-#include <cryptopp/base64.h>
 
 ConnectWindow::ConnectWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -87,7 +71,6 @@ void ConnectWindow::on_pbConnect_clicked()
 			tr("Hiba történt kapcsolódás közben!"),
 			db->lastError().text());
     }
-	//db->close();
 }
 
 void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem *item)
@@ -106,36 +89,29 @@ void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem *item)
 			if (xmlReader.isStartElement())
 			{
                 QStringRef tagname = xmlReader.name();
+				xmlReader.readNext();
                 if (0 == tagname.compare(tr("port")))
                 {
-                    xmlReader.readNext();
                     QStringRef port = xmlReader.text();
-                    ui->lEPort->setText(port.isNull() ? "" : port.toString());
+                    ui->lEPort->setText(port.toString());
                 }
                 else if (0 == tagname.compare(tr("host")))
                 {
-                    xmlReader.readNext();
                     QStringRef host = xmlReader.text();
-                    if (!host.isNull())
-                        ui->lEHost->setText(host.toString());
+                    ui->lEHost->setText(host.toString());
                 }
                 else if (0 == tagname.compare(tr("username")))
                 {
-                    xmlReader.readNext();
                     QStringRef username = xmlReader.text();
-                    if (!username.isNull())
-                        ui->lEUsername->setText(*username.string());
+                    ui->lEUsername->setText(username.toString());
                 }
                 else if (0 == tagname.compare(tr("service")))
                 {
-                    xmlReader.readNext();
                     QStringRef service = xmlReader.text();
-                    if (!service.isNull())
-                        ui->lEService->setText(service.toString());
+                    ui->lEService->setText(service.toString());
                 }
                 else if (0 == tagname.compare(tr("password")))
                 {
-                    xmlReader.readNext();
                     // TODO
                 }
 			}
@@ -189,9 +165,7 @@ void ConnectWindow::on_pbSave_clicked()
 				stream.writeStartDocument();
 				stream.writeStartElement("Connection");
 				stream.writeAttribute("name", connectionName);
-                QString host = ui->lEHost->text();
-                if (!host.isEmpty())
-                    stream.writeTextElement("host", host);
+                stream.writeTextElement("host", ui->lEHost->text());
 				stream.writeTextElement("port", ui->lEPort->text());
 				stream.writeTextElement("service", ui->lEService->text());
 				stream.writeTextElement("username", ui->lEUsername->text());

@@ -23,9 +23,9 @@ namespace queries
         WHERE object_type = 'INDEX' AND object_name NOT LIKE '%$%'";
 
 	const QString VIEWS = QString::fromLatin1("Nézetek");
-    const QString GET_VIEWS = "SELECT object_name FROM dba_objects \
+    const QString GET_VIEWS = "SELECT object_name FROM user_objects \
         WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
-	const QString GET_VIEWS_COUNT = "SELECT COUNT(*) FROM dba_objects \
+	const QString GET_VIEWS_COUNT = "SELECT COUNT(*) FROM user_objects \
         WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
 
 	const QString FUNCTIONS = QString::fromLatin1("Függvények");
