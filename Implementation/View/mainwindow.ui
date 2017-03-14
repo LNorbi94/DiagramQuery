@@ -73,7 +73,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuF_jl">
@@ -84,7 +84,25 @@
     <addaction name="separator"/>
     <addaction name="actionKil_p_s"/>
    </widget>
+   <widget class="QMenu" name="menuAdatb_zis_Objektum">
+    <property name="title">
+     <string>Adatbázis Objektum</string>
+    </property>
+    <widget class="QMenu" name="menu_j">
+     <property name="title">
+      <string>Új..</string>
+     </property>
+     <addaction name="actionT_bla"/>
+     <addaction name="actionIndex"/>
+     <addaction name="actionN_zet"/>
+     <addaction name="actionF_ggv_ny"/>
+    </widget>
+    <addaction name="menu_j"/>
+    <addaction name="actionMegtekint_s"/>
+    <addaction name="actionT_rl_s"/>
+   </widget>
    <addaction name="menuF_jl"/>
+   <addaction name="menuAdatb_zis_Objektum"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionKil_p_s">
@@ -98,6 +116,36 @@
   <action name="action_j_lap">
    <property name="text">
     <string>Új lap</string>
+   </property>
+  </action>
+  <action name="actionT_bla">
+   <property name="text">
+    <string>Tábla</string>
+   </property>
+  </action>
+  <action name="actionIndex">
+   <property name="text">
+    <string>Index</string>
+   </property>
+  </action>
+  <action name="actionN_zet">
+   <property name="text">
+    <string>Nézet</string>
+   </property>
+  </action>
+  <action name="actionF_ggv_ny">
+   <property name="text">
+    <string>Függvény</string>
+   </property>
+  </action>
+  <action name="actionMegtekint_s">
+   <property name="text">
+    <string>Megtekintés</string>
+   </property>
+  </action>
+  <action name="actionT_rl_s">
+   <property name="text">
+    <string>Törlés</string>
    </property>
   </action>
  </widget>

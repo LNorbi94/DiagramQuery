@@ -5,7 +5,7 @@ MainWindow::MainWindow(QSqlDatabase& db, QWidget * parent) :
     QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , db(db)
-	, logger(*new DBLogger)
+    , logger(*new DBLogger)
 {
 	ui->setupUi(this);
 
@@ -13,12 +13,15 @@ MainWindow::MainWindow(QSqlDatabase& db, QWidget * parent) :
 	progressBar->setRange(0, 100);
     progressBar->setValue(0);
 	progressBar->setMaximumSize(150, 18);
+    logger.setProgressBar(progressBar);
 
 	ui->mainSplitter->setSizes({ 150, 600 });
 	ui->splitter->setSizes({ 400, 200 });
 
-    queries = new QTextEdit(ui->tWUpper);
-	queries->textCursor().insertHtml("Select * FROM emp;");
+    queries = new SqlEditor(ui->tWUpper);
+    queries->textCursor().insertText("--aS");
+    queries->textCursor().insertBlock();
+    queries->textCursor().insertText("SELECT * FROM emp;");
 	queries->setFont(QFont("Segoe UI", 11));
 	SqlHighlighter * highLighter = new SqlHighlighter();
 	highLighter->setDocument(queries->document());
@@ -46,8 +49,11 @@ MainWindow::MainWindow(QSqlDatabase& db, QWidget * parent) :
 	ui->tWUpper->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 	ui->tWLower->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 
-	QShortcut * shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), queries);
-	QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(executeQuery()));
+    QShortcut * shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), queries);
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(executeQuery()));
+
+    shortcut = new QShortcut(QKeySequence(Qt::Key_F4), queries);
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(showExecutionPlan()));
 }
 
 MainWindow::~MainWindow()
@@ -150,22 +156,9 @@ void MainWindow::on_tWLower_tabCloseRequested(int index)
  */
 void MainWindow::executeQuery()
 {
-	QTextCursor cursor(queries->textCursor());
-	cursor.beginEditBlock();
-	cursor.clearSelection();
-	cursor.movePosition(QTextCursor::PreviousWord, QTextCursor::KeepAnchor);
-	while (!cursor.selectedText().contains(";") && cursor.movePosition(QTextCursor::NextWord, QTextCursor::KeepAnchor));
-	cursor.clearSelection();
-	cursor.movePosition(QTextCursor::PreviousWord, QTextCursor::KeepAnchor);
-	while (cursor.movePosition(QTextCursor::PreviousWord, QTextCursor::KeepAnchor) && cursor.selectedText().left(1) != ";");
-	if (!cursor.atStart())
-		cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
-	cursor.endEditBlock();
-
-	QString query = cursor.selectedText().simplified();
-	QSqlQuery * q = new QSqlQuery(db);
-	query = query.remove(QRegExp(";"));
-	std::function<bool()> toExecute = [&] { if (db.isValid()) { q->exec(query); }
+    QSqlQuery * q = new QSqlQuery(db);
+    QString query = queries->extractQuery();
+    std::function<bool()> toExecute = [&] { q->exec(query);
 											return q->isActive(); };
 
 	if ('S' == query.begin()->toUpper())
@@ -190,4 +183,70 @@ void MainWindow::executeQuery()
 	{
 		logger.logWithTime("Frissítés sikeresen végrehajtva.", "Frissítés sikertelen.", toExecute);
 	}
+    else if ('M' == query.begin()->toUpper())
+    {
+        /// TODO: implement make chart command
+    }
+    else
+    {
+        logger.logWithTime("Művelet sikeresen végrehajtva.", "Művelet sikertelen.", toExecute);
+    }
+}
+
+void MainWindow::showExecutionPlan()
+{
+    std::function<bool()> toExecute = [&] {
+        QSqlQuery * q = new QSqlQuery(db);
+        QString query = queries->extractQuery();
+        QString explainPlan = QString("EXPLAIN PLAN SET STATEMENT_ID = 'temp1' FOR %1").arg(query);
+        bool s = q->exec(explainPlan);
+        q->exec("SELECT cardinality \"Rows\", \
+                    lpad(' ',level-1)||operation||' '||options||' '||object_name \"Plan\" \
+                FROM PLAN_TABLE \
+                CONNECT BY prior id = parent_id \
+                        AND prior statement_id = statement_id \
+                START WITH id = 0 \
+                              AND statement_id = 'temp1' \
+                ORDER BY id");
+        //      q->exec("SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())");
+        QSqlQueryModel* model = new QSqlQueryModel;
+        model->setQuery(*q);
+        QTableView *view = new QTableView(ui->tWLower);
+        view->setModel(model);
+        view->show();
+        ui->tWLower->addTab(view, "Lekérdezési terv");
+        ui->tWLower->setCurrentWidget(view);
+        db.exec("DELETE FROM PLAN_TABLE WHERE statement_id = 'temp1'");
+        return s;
+    };
+    logger.logWithTime("Lekérdezési terv sikeresen elkészült!", "Lekérdezési terv létrehozása sikertelen.", toExecute);
+}
+
+void MainWindow::on_actionT_rl_s_triggered()
+{
+    QTreeWidget* tw = ui->trWLeft;
+    if (tw->selectedItems().size() > 0)
+    {
+        QTreeWidgetItem* child = tw->selectedItems().at(0);
+        QString parent = child->parent()->text(0);
+        std::function<bool()> toExecute;
+        if (queries::TABLES == parent)
+        {
+            toExecute = [&] { return db.exec(QString("DROP TABLE %1").arg(child->text(0))).isActive(); };
+        }
+        else if (queries::INDEXES == parent)
+        {
+            toExecute = [&] { return false; };
+        }
+        else if (queries::VIEWS == parent)
+        {
+            toExecute = [&] { return false; };
+        }
+        else if (queries::FUNCTIONS == parent)
+        {
+            toExecute = [&] { return false; };
+        }
+        logger.logWithTime("Adatbázisban található objektum sikeresen törölve.", "Hiba történt a törlés végrehajtása közben!", toExecute);
+        delete child;
+    }
 }

@@ -22,8 +22,9 @@
 #include <QTime>
 
 #include "sqlhighlighter.hpp"
-#include "Headers/constants.h"
+#include "constants.h"
 #include "dblogger.hpp"
+#include "sqleditor.h"
 
 namespace Ui
 {
@@ -45,6 +46,9 @@ private slots:
 	void on_tWUpper_tabCloseRequested(int index);
 	void on_tWLower_tabCloseRequested(int index);
 	void executeQuery();
+    void showExecutionPlan();
+
+    void on_actionT_rl_s_triggered();
 
 private:
     bool fillList(QTreeWidgetItem * list, const QString& queryToExecute, const QString& queryCount);
@@ -57,7 +61,7 @@ private:
     QSqlDatabase& db;
     QProgressBar* progressBar;
 	DBLogger& logger;
-	QTextEdit* queries;
+    SqlEditor* queries;
 };
 
 #endif // MAINWINDOW_H

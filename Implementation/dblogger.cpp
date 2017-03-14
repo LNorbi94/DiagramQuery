@@ -1,6 +1,6 @@
-﻿#include "dblogger.hpp"
+﻿#include "Headers/dblogger.hpp"
 
-DBLogger::DBLogger(QWidget * parent) : QPlainTextEdit(parent)
+DBLogger::DBLogger(QWidget * parent, QProgressBar* progressBar) : QPlainTextEdit(parent), progressBar(progressBar)
 {
 	QPlainTextEdit::setReadOnly(true);
 }
@@ -15,17 +15,24 @@ bool DBLogger::logWithTime(const QString & success, const QString& fail, std::fu
 	QElapsedTimer timer;
 	int elapsedTime = 0;
 	timer.start();
+    progressBar->setRange(0, 0);
 	if (slowFunc())
 	{
 		elapsedTime = timer.elapsed();
 		appendPlainText(success);
-		appendPlainText(QString::fromLatin1("A művelet végrehajtva %1 ms alatt.").arg(elapsedTime));
+        appendPlainText(QString::fromUtf8("A művelet végrehajtva %1 ms alatt.").arg(elapsedTime));
+        progressBar->setRange(0, 100);
 		return true;
 	}
 	else
 	{
 		appendPlainText(fail);
+        progressBar->setRange(0, 100);
 		return false;
-	}
+    }
 }
 
+void DBLogger::setProgressBar(QProgressBar* pb)
+{
+    progressBar = pb;
+}
