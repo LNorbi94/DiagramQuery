@@ -9,10 +9,13 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 	: QSyntaxHighlighter(parent)
 {
 	Rule rule;
+    QStringList keywordPatterns;
 
     _keywordForm.setForeground(QColor(0, 0, 0));
-	_keywordForm.setFontWeight(QFont::Bold);
-	QStringList keywordPatterns;
+    _keywordForm.setFontWeight(QFont::Bold);
+    _functionForm.setForeground(QColor(70, 87, 137));
+    _functionForm.setFontWeight(QFont::Bold);
+
     keywordPatterns.reserve(128);
 	keywordPatterns << "\\baccess\\b"		<< "\\badd\\b"		<< "\\ball\\b"
 					<< "\\balter\\b"		<< "\\band\\b"		<< "\\bany\\b"
@@ -57,10 +60,8 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
     {
         rule.pattern = QRegExp(pattern);
         _rules.append(rule);
-
     }
-    _keywordForm.setForeground(QColor(70, 87, 137));
-    _keywordForm.setFontWeight(QFont::Bold);
+
     keywordPatterns.clear();
     keywordPatterns << "\\babs\\b"
                     << "\\bacos\\b" << "\\basin\\b" << "\\batan\\b"
@@ -142,7 +143,7 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
                     << "\\bstddev_pop\\b" << "\\bstddev_samp\\b" << "\\bvar_pop\\b"
                     << "\\bvar_samp\\b" << "\\bvariance\\b" << "\\bcv\\b"
                     << "\\biteration_number\\b" << "\\bpresentnnv\\b" << "\\bpresentv\\b";
-    rule.format = _keywordForm;
+    rule.format = _functionForm;
     for (auto& pattern : keywordPatterns)
     {
         rule.pattern = QRegExp(pattern);
@@ -156,12 +157,10 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
     rule.pattern = QRegExp("--[^\\n]*");
 	rule.format = _commentForm;
 	_rules.append(rule);
-    _commentForm.setForeground(QColor(221, 17, 68));
-    rule.pattern = QRegExp("'\\w+'");
-    rule.format = _commentForm;
-    _rules.append(rule);
 
-    rule.pattern = QRegExp("\\s+\\d+");
+    _literalForm.setForeground(QColor(221, 17, 68));
+    rule.pattern = QRegExp("'\\w+'");
+    rule.format = _literalForm;
     _rules.append(rule);
 
 }
@@ -173,19 +172,30 @@ SqlHighlighter::~SqlHighlighter()
 
 void SqlHighlighter::highlightBlock(const QString & text)
 {
-    QString alteredText = text.compare("ROWID") == 0 ? text : text.toLower();
-	foreach(const Rule &rule, _rules) {
-		QRegExp expression(rule.pattern);
-		int index = expression.indexIn(alteredText);
-		while (index >= 0) {
-			int length = expression.matchedLength();
-			setFormat(index, length, rule.format);
-			index = expression.indexIn(alteredText, index + length);
-		}
-	}
-	setCurrentBlockState(0);
+    QString alteredText = text.toLower();
+    for (const auto &rule : _rules)
+    {
+        QRegExp expression(rule.pattern);
+        int index = expression.indexIn(alteredText);
+        while (index >= 0)
+        {
+            int length = expression.matchedLength();
+            setFormat(index, length, rule.format);
+            index = expression.indexIn(alteredText, index + length);
+        }
+    }
 
-    //int startIndex = 0;
-    //if (previousBlockState() != 1)
-    //	startIndex = _commentExpr.indexIn(text);
+    QRegExp expression("\\d+");
+    QRegExp expr2("\\w+");
+    int index = expression.indexIn(alteredText);
+    if (index >= 1 && (expr2.indexIn(alteredText.at(index - 1)) < 0))
+    {
+        while (index >= 0)
+        {
+            int length = expression.matchedLength();
+            setFormat(index, length, _literalForm);
+            index = expression.indexIn(alteredText, index + length);
+        }
+    }
+    setCurrentBlockState(0);
 }
