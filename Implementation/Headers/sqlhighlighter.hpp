@@ -6,29 +6,27 @@
 
 class SqlHighlighter : public QSyntaxHighlighter
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    SqlHighlighter(QTextDocument * parent = nullptr);
-    ~SqlHighlighter();
+	SqlHighlighter(QTextDocument* parent = nullptr);
 
 protected:
-    void highlightBlock(const QString &text) override;
+	void highlightBlock(const QString& text) override;
 
 private:
-    struct Rule
-    {
-        QRegExp pattern;
-        QTextCharFormat format;
-    };
-    QVector<Rule> _rules;
+	struct Rule
+	{
+		QRegExp pattern;
+		QTextCharFormat format;
+	};
 
-    QRegExp _commentExpr;
+	QVector<Rule> _rules;
 
-    QTextCharFormat _keywordForm;
-    QTextCharFormat _functionForm;
-    QTextCharFormat _commentForm;
-    QTextCharFormat _literalForm;
+	QTextCharFormat _keywordForm;
+	QTextCharFormat _functionForm;
+	QTextCharFormat _commentForm;
+	QTextCharFormat _literalForm;
 };
 
 #endif // SQLHIGHLIGHTER_HPP

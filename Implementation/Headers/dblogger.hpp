@@ -15,14 +15,24 @@ class DBLogger : public QPlainTextEdit
 	Q_OBJECT
 
 public:
-    DBLogger(QWidget * parent = nullptr, QProgressBar* progressBar = nullptr);
+	DBLogger(QWidget* parent = nullptr, QProgressBar* progressBar = nullptr)
+		: QPlainTextEdit(parent), progressBar(progressBar)
+	{
+		QPlainTextEdit::setReadOnly(true);
+	}
 
-	void appendPlainText(const QString& text);
-	bool logWithTime(const QString & success, const QString& fail, std::function<bool()>& slowFunc);
-    void setProgressBar(QProgressBar* progressBar);
+	void appendPlainText(const QString& text)
+	{
+		QPlainTextEdit::appendPlainText(QString("[%1] %2").arg(QTime::currentTime().toString()).arg(text));
+	}
+	bool logWithTime(const QString& success, const QString& fail, std::function<bool(QString)>& slowFunc);
+	void setProgressBar(QProgressBar* pB)
+	{
+		progressBar = pB;
+	}
 
 private:
-    QProgressBar* progressBar;
+	QProgressBar* progressBar;
 };
 
 #endif
