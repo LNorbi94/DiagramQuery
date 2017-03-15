@@ -1,6 +1,6 @@
 #include "Headers/dblogger.hpp"
 
-bool DBLogger::logWithTime(const QString & success, const QString& fail, std::function<bool(QString)>& slowFunc)
+bool DBLogger::logWithTime(const QString & success, const QString& fail, std::function<bool(QString&)>& slowFunc)
 {
 	QElapsedTimer timer;
 	int elapsedTime = 0;
@@ -8,7 +8,7 @@ bool DBLogger::logWithTime(const QString & success, const QString& fail, std::fu
 	progressBar->setRange(0, 0);
 	QString errorMessage;
 	bool ret = false;
-	if (ret = slowFunc(errorMessage))
+    if ((ret = slowFunc(errorMessage)))
 	{
 		elapsedTime = timer.elapsed();
 		appendPlainText(success);

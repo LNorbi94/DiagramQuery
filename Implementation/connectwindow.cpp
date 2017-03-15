@@ -179,7 +179,6 @@ void ConnectWindow::on_pbSave_clicked()
 	}
 }
 
-inline
 ConnectWindow::~ConnectWindow()
 {
 	delete ui;

@@ -6,6 +6,7 @@
 
 #include <QTreeWidgetItem>
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QProgressBar>
 #include <QTextEdit>
 #include <QPlainTextEdit>
@@ -18,6 +19,7 @@
 #include <QSqlQueryModel>
 
 #include <QFileSystemModel>
+#include <QTextStream>
 
 #include "sqlhighlighter.hpp"
 #include "constants.h"
@@ -44,6 +46,8 @@ private slots:
 	void on_tWLower_tabCloseRequested(int index);
 	void executeQuery();
 	void showExecutionPlan();
+    void executeSelection();
+    void executeString(const QString& query);
 
 	void on_actionT_rl_s_triggered();
 	void on_actionKil_p_s_triggered()
@@ -51,6 +55,12 @@ private slots:
 		this->close();
 		this->destroy();
 	}
+
+    void on_actionMegtekint_s_triggered();
+
+    void on_actionBet_lt_s_triggered();
+
+    void on_actionMent_s_triggered();
 
 private:
 	bool fillList(QTreeWidgetItem* list, const QString& queryToExecute);

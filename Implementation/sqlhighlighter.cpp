@@ -158,6 +158,9 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 	rule.format = _commentForm;
 	_rules.append(rule);
 
+    rule.pattern = QRegExp("/\\*([^/]|[^*]/)*\\*/");
+    _rules.append(rule);
+
 	_literalForm.setForeground(QColor(221, 17, 68));
 	rule.pattern = QRegExp("'\\w+'");
 	rule.format = _literalForm;
