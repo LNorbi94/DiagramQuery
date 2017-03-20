@@ -3,6 +3,20 @@
 
 #include <QObject>
 #include <QTextEdit>
+#include <QTextStream>
+#include <QFileDialog>
+#include <QChart>
+
+#include <functional>
+
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QSqlError>
+
+#include <QChartView>
+#include <QPieSeries>
+#include <QPieSlice>
+#include <QGraphicsLayout>
 
 class SqlEditor : public QTextEdit
 {
@@ -12,6 +26,15 @@ public:
 	SqlEditor(QWidget* parent = nullptr) : QTextEdit(parent) { }
 
 	QString extractQuery();
+
+    void save();
+    void load();
+
+    bool makeChart(QString& message
+                                                        , QtCharts::QChart* chart
+                                                        , QStringList *queryInWords
+                                                        , QString query
+                                                        , QSqlQuery* q);
 private:
 
 };

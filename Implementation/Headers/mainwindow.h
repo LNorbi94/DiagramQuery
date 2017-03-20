@@ -17,9 +17,15 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlQueryModel>
+#include <QSqlRecord>
 
 #include <QFileSystemModel>
 #include <QTextStream>
+
+#include <QChartView>
+#include <QPieSeries>
+#include <QPieSlice>
+#include <QGraphicsLayout>
 
 #include "sqlhighlighter.hpp"
 #include "constants.h"
@@ -80,6 +86,8 @@ private:
 	{
 		return fillList(function, queries::GET_FUNCTIONS);
 	}
+
+    void registerShortcuts();
 
 	Ui::MainWindow* ui;
 	QSqlDatabase& db;

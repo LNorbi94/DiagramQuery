@@ -6,6 +6,7 @@
 
 QT  += core gui
 QT  += sql
+QT	+= charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,3 +37,8 @@ else:unix: LIBS += -L$$PWD/../Build/ -lqsqloci
 
 INCLUDEPATH += $$PWD/../Build
 DEPENDPATH += $$PWD/../Build
+
+DISTFILES +=
+
+RESOURCES += \
+    images.qrc

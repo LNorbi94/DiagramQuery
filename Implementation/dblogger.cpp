@@ -21,5 +21,14 @@ bool DBLogger::logWithTime(const QString & success, const QString& fail, std::fu
 		progressBar->setRange(0, 100);
 	}
 	progressBar->setRange(0, 100);
-	return ret;
+    return ret;
+}
+
+void DBLogger::log(const QString text, const QString errorMessage)
+{
+    appendPlainText(text);
+    if (!errorMessage.isEmpty())
+    {
+        appendPlainText(errorMessage);
+    }
 }

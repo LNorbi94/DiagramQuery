@@ -19,8 +19,14 @@
   <property name="windowTitle">
    <string>QueryCreator</string>
   </property>
+  <property name="windowIcon">
+   <iconset theme="SP_TitleBarMenuButton"/>
+  </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextBesideIcon</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="baseSize">
@@ -73,7 +79,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuF_jl">

@@ -53,7 +53,7 @@ void ConnectWindow::on_pbConnect_clicked()
 	QSqlDatabase* db = new QSqlDatabase(QSqlDatabase::addDatabase("QOCI"));
 	db->setHostName(ui->lEHost->text());
 	db->setDatabaseName(ui->lEService->text());
-	db->setPort(ui->lEPort->text().toInt());
+    db->setPort(ui->lEPort->text().toInt());
 	if (Q_LIKELY(db->open(ui->lEUsername->text()
 		, ui->lEPassword->text())))
 	{

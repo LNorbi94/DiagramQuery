@@ -26,6 +26,7 @@ public:
 		QPlainTextEdit::appendPlainText(QString("[%1] %2").arg(QTime::currentTime().toString()).arg(text));
 	}
     bool logWithTime(const QString& success, const QString& fail, std::function<bool(QString&)>& slowFunc);
+    void log(const QString text, const QString errorMessage = "");
 	void setProgressBar(QProgressBar* pB)
 	{
 		progressBar = pB;

@@ -142,7 +142,8 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 					<< "\\bratio_to_report\\b" << "\\brow_number\\b" << "\\bstddev\\b"
 					<< "\\bstddev_pop\\b" << "\\bstddev_samp\\b" << "\\bvar_pop\\b"
 					<< "\\bvar_samp\\b" << "\\bvariance\\b" << "\\bcv\\b"
-					<< "\\biteration_number\\b" << "\\bpresentnnv\\b" << "\\bpresentv\\b";
+                    << "\\biteration_number\\b" << "\\bpresentnnv\\b" << "\\bpresentv\\b"
+                    << "\\bmake\\b" << "\\bchart\\b" << "\\bpiechart\\b";
 	rule.format = _functionForm;
 	for (auto& pattern : keywordPatterns)
 	{
@@ -151,7 +152,7 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 	}
 
 	rule.pattern = QRegExp("\\btranslate\\b \\w+ \\busing\\b");
-	_rules.append(rule);
+    _rules.append(rule);
 
 	_commentForm.setForeground(Qt::gray);
 	rule.pattern = QRegExp("--[^\\n]*");
