@@ -3,9 +3,9 @@
 bool DBLogger::logWithTime(const QString & success, const QString& fail, std::function<bool(QString&)>& slowFunc)
 {
 	QElapsedTimer timer;
-	int elapsedTime = 0;
+    qint64 elapsedTime = 0;
 	timer.start();
-	progressBar->setRange(0, 0);
+    progressBar->setRange(0, 0);
 	QString errorMessage;
 	bool ret = false;
     if ((ret = slowFunc(errorMessage)))
@@ -17,10 +17,9 @@ bool DBLogger::logWithTime(const QString & success, const QString& fail, std::fu
 	else
 	{
 		appendPlainText(fail);
-		appendPlainText(errorMessage);
-		progressBar->setRange(0, 100);
+        appendPlainText(errorMessage);
 	}
-	progressBar->setRange(0, 100);
+    progressBar->setRange(0, 100);
     return ret;
 }
 

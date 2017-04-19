@@ -15,8 +15,8 @@ class DBLogger : public QPlainTextEdit
 	Q_OBJECT
 
 public:
-	DBLogger(QWidget* parent = nullptr, QProgressBar* progressBar = nullptr)
-		: QPlainTextEdit(parent), progressBar(progressBar)
+    DBLogger(QWidget* parent = nullptr, QProgressBar* pB = nullptr)
+        : QPlainTextEdit(parent), progressBar(pB)
 	{
 		QPlainTextEdit::setReadOnly(true);
 	}

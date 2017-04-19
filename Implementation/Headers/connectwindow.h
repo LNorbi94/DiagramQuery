@@ -29,7 +29,7 @@ class ConnectWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	explicit ConnectWindow(QWidget* parent = nullptr);
+    explicit ConnectWindow(QWidget* parent = nullptr);
 	~ConnectWindow();
 
 	void fillConnectionList();

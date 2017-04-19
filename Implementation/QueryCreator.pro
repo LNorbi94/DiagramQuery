@@ -8,6 +8,8 @@ QT  += core gui
 QT  += sql
 QT	+= charts
 
+QMAKE_CXXFLAGS += -Wextra -fomit-frame-pointer -std=c++11 -pedantic -Wpadded
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET      = QueryCreator
@@ -37,8 +39,3 @@ else:unix: LIBS += -L$$PWD/../Build/ -lqsqloci
 
 INCLUDEPATH += $$PWD/../Build
 DEPENDPATH += $$PWD/../Build
-
-DISTFILES +=
-
-RESOURCES += \
-    images.qrc

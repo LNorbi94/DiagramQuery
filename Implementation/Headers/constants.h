@@ -11,7 +11,7 @@ namespace connections
 namespace queries
 {
 	const QString TABLES = QString::fromUtf8("Táblák");
-	const QString GET_TABLES = "SELECT object_name FROM user_objects \
+    const QString GET_TABLES = "SELECT object_name FROM dba_objects \
 	WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";
 	const QString GET_TABLES_COUNT = "SELECT COUNT(*) FROM user_objects \
 	WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";

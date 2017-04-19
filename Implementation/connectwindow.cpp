@@ -2,13 +2,13 @@
 #include "ui_connectwindow.h"
 
 ConnectWindow::ConnectWindow(QWidget* parent) :
-	QMainWindow(parent)
-	, ui(new Ui::ConnectWindow)
+    QMainWindow(parent)
+    , ui(new Ui::ConnectWindow)
 {
-	ui->setupUi(this);
-	fillConnectionList();
-	QShortcut * shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), ui->lwConnections);
-	QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(deleteConnection()));
+    ui->setupUi(this);
+    fillConnectionList();
+    QShortcut * shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), ui->lwConnections);
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(deleteConnection()));
 }
 
 /**
@@ -73,14 +73,14 @@ void ConnectWindow::on_pbConnect_clicked()
 
 void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem* item)
 {
-	QString filename = connections::CONFIGFOLDER;
+    QString filename = connections::CONFIGFOLDER;
 	filename.append(QDir::separator());
 	filename.append(item->text());
 	filename.append(".xml");
-	QFile file(filename);
+    QFile file(filename);
 	if (Q_LIKELY(file.open(QIODevice::ReadOnly)))
 	{
-		QXmlStreamReader xmlReader;
+         QXmlStreamReader xmlReader;
 		xmlReader.setDevice(&file);
 		while (!xmlReader.atEnd())
 		{

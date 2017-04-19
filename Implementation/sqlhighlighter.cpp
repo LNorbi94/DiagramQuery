@@ -54,7 +54,7 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 					<< "\\bvalidate\\b"		<< "\\bvalues\\b"	<< "\\bvarchar\\b"
 					<< "\\bvarchar2\\b"		<< "\\bview\\b"		<< "\\bwhenever\\b"
 					<< "\\bwhere\\b"		<< "\\bwith\\b"     << "\\bjoin\\b"
-					<< "\\bnatural join\\b";
+                    << "\\bnatural join\\b" << "\\breplace\\b";
 	rule.format = _keywordForm;
 	for (auto& pattern : keywordPatterns)
 	{
@@ -76,7 +76,7 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 					<< "\\binitcap\\b" << "\\blower\\b" << "\\blpad\\b"
 					<< "\\bltrim\\b" << "\\bnls_initcap\\b" << "\\bnls_lower\\b"
 					<< "\\bnlssort\\b" << "\\bnls_upper\\b" << "\\bregexp_replace\\b"
-					<< "\\bregexp_substr\\b" << "\\breplace\\b" << "\\brpad\\b"
+                    << "\\bregexp_substr\\b" << "\\brpad\\b"
 					<< "\\brtrim\\b" << "\\bsoundex\\b" << "\\bsubstr\\b"
 					<< "\\btranslate\\b" << "\\btreat\\b" << "\\btrim\\b"
 					<< "\\bupper\\b" << "\\bnls_charset_decl_len\\b" << "\\bnls_charset_id\\b"
@@ -143,7 +143,8 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 					<< "\\bstddev_pop\\b" << "\\bstddev_samp\\b" << "\\bvar_pop\\b"
 					<< "\\bvar_samp\\b" << "\\bvariance\\b" << "\\bcv\\b"
                     << "\\biteration_number\\b" << "\\bpresentnnv\\b" << "\\bpresentv\\b"
-                    << "\\bmake\\b" << "\\bchart\\b" << "\\bpiechart\\b";
+                    << "\\bmake\\b" << "\\bchart\\b" << "\\bpiechart\\b"
+                    << "\\bbarchart\\b";
 	rule.format = _functionForm;
 	for (auto& pattern : keywordPatterns)
 	{

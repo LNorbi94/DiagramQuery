@@ -23,9 +23,10 @@
 #include <QTextStream>
 
 #include <QChartView>
-#include <QPieSeries>
-#include <QPieSlice>
 #include <QGraphicsLayout>
+
+#include <QtConcurrent/QtConcurrent>
+#include <thread>
 
 #include "sqlhighlighter.hpp"
 #include "constants.h"
@@ -49,11 +50,7 @@ public:
 private slots:
 	void on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int column);
 	void on_tWUpper_tabCloseRequested(int index);
-	void on_tWLower_tabCloseRequested(int index);
-	void executeQuery();
-	void showExecutionPlan();
-    void executeSelection();
-    void executeString(const QString& query);
+    void on_tWLower_tabCloseRequested(int index);
 
 	void on_actionT_rl_s_triggered();
 	void on_actionKil_p_s_triggered()
@@ -67,11 +64,25 @@ private slots:
     void on_actionBet_lt_s_triggered();
 
     void on_actionMent_s_triggered();
+    void showExecutionPlan();
+    void executeSelection();
+    void executeString(const QString& query);
+
+    /*
+     * Finds and executes query "near" the cursor in the current document.
+     * It selects every text until EOL, from previous ;.
+     *
+     */
+    void executeQuery()
+    {
+        QString query = queries->extractQuery();
+        executeString(query);
+    }
 
 private:
-	bool fillList(QTreeWidgetItem* list, const QString& queryToExecute);
+    bool fillList(QTreeWidgetItem* list, const QString& queryToExecute) noexcept;
 	bool fillTableList(QTreeWidgetItem* table)
-	{
+    {
 		return fillList(table, queries::GET_TABLES);
 	}
 	bool fillIndexList(QTreeWidgetItem* index)
@@ -89,11 +100,11 @@ private:
 
     void registerShortcuts();
 
+    DBLogger& logger;
 	Ui::MainWindow* ui;
 	QSqlDatabase& db;
-	QProgressBar* progressBar;
-	DBLogger& logger;
-	SqlEditor* queries;
+    QProgressBar* progressBar;
+    SqlEditor* queries;
 };
 
 #endif // MAINWINDOW_H

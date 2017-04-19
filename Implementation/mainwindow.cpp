@@ -1,11 +1,12 @@
 #include "Headers/mainwindow.h"
 #include "ui_mainwindow.h"
+#include <iostream>
 
-MainWindow::MainWindow(QSqlDatabase& db, QWidget * parent) :
+MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
 	QMainWindow(parent)
+  , logger(*new DBLogger)
 	, ui(new Ui::MainWindow)
-	, db(db)
-	, logger(*new DBLogger)
+    , db(database)
 {
     ui->setupUi(this);
 
@@ -51,20 +52,37 @@ MainWindow::MainWindow(QSqlDatabase& db, QWidget * parent) :
 }
 
 
-bool MainWindow::fillList(QTreeWidgetItem* list, const QString& queryToExecute)
+bool MainWindow::fillList(QTreeWidgetItem* list, const QString& queryToExecute) noexcept
 {
-	QSqlQuery query = db.exec(queryToExecute);
-	if (!query.isActive())
+    //setUpdatesEnabled(false);
+    QList<QTreeWidgetItem*> items;
+    //QFuture<void> aSyncCall = QtConcurrent::run([&] {
+    QSqlQuery query = db.exec(queryToExecute);
+    if (!query.isActive())
 	{
-		return false;
+        // return false;
 	}
+    //QFuture<void> future = QtConcurrent::run([&] {
 	while (query.next())
 	{
-		list->insertChild(0, new QTreeWidgetItem(
-			QStringList(query.value(0).toString()))
-		);
-	}
+        items.append(new QTreeWidgetItem(
+                         QStringList(query.value(0).toString())));
+        //);
+    }
+    //} });
+    std::cerr << "kész";
+    //setUpdatesEnabled(true);
+    //});
+    //list->addChildren(items);
+    //future.waitForFinished();
+    list->addChildren(items);
+    //QtConcurrent::run(list, &QTreeWidgetItem::addChildren, items);
+    //QFuture<void> futura = QtConcurrent::run(list, &QTreeWidgetItem::addChildren, items);
     return true;
+}
+
+void MainWindow::executeSelection()
+{
 }
 
 void MainWindow::registerShortcuts()
@@ -104,18 +122,12 @@ void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int /*colum
         on_actionMegtekint_s_triggered();
         return;
     }
-	logger.logWithTime("Adatbázisban található objektumok sikeresen lekérdezve.", "Hiba történt a lekérdezés végrehajtása közben!", toExecute);
-}
 
-/*
- * Finds and executes query "near" the cursor in the current document.
- * It selects every text until EOL, from previous ;.
- *
- */
-void MainWindow::executeQuery()
-{
-    QString query = queries->extractQuery();
-    executeString(query);
+    std::thread t([&] {
+        logger.logWithTime("Adatbázisban található objektumok sikeresen lekérdezve."
+                           , "Hiba történt a lekérdezés végrehajtása közben!", toExecute);
+    });
+    t.join();
 }
 
 void MainWindow::showExecutionPlan()
@@ -127,21 +139,22 @@ void MainWindow::showExecutionPlan()
 		bool success = q->exec(explainPlan);
 		if (success)
 		{
-			success = q->exec("SELECT cardinality \"Rows\", \
+            //success = q->exec("SELECT cardinality \"Rows\", \
 				lpad(' ',level-1)||operation||' '||options||' '||object_name \"Plan\" \
 				FROM PLAN_TABLE \
 				CONNECT BY prior id = parent_id \
 				AND prior statement_id = statement_id \
 				START WITH id = 0 \
 				AND statement_id = 'temp1' \
-				ORDER BY id");
-			//      q->exec("SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())");
+                ORDER BY id");
+             success =     q->exec("SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())");
 			if (success)
 			{
 				QSqlQueryModel* model = new QSqlQueryModel;
 				model->setQuery(*q);
 				QTableView *view = new QTableView(ui->tWLower);
 				view->setModel(model);
+                view->horizontalHeader()->setStretchLastSection(true);
 				view->show();
 				ui->tWLower->addTab(view, "Lekérdezési terv");
 				ui->tWLower->setCurrentWidget(view);
@@ -154,11 +167,11 @@ void MainWindow::showExecutionPlan()
     logger.logWithTime("Lekérdezési terv sikeresen elkészült!", "Lekérdezési terv létrehozása sikertelen.", toExecute);
 }
 
-void MainWindow::executeSelection()
+/*void MainWindow::executeSelection()
 {
     QString query = queries->textCursor().selectedText();
     executeString(query);
-}
+}*/
 
 void MainWindow::executeString(const QString& query)
 {
@@ -196,13 +209,14 @@ void MainWindow::executeString(const QString& query)
             QT_CHARTS_USE_NAMESPACE
             QChart* chart = new QChart();
             bool success;
-            toExecute = [&] (QString& message)
+            toExecute = [&] (QString& msg)
             {
-                success = queries->makeChart(message
+                success = queries->makeChart(msg
                                    , chart
                                    , words
                                    , query
                                    , q);
+                message = msg;
                 return success;
             };
 
@@ -215,7 +229,6 @@ void MainWindow::executeString(const QString& query)
                 ui->tWUpper->addTab(chartView, "Diagram eredménye");
                 ui->tWUpper->setCurrentWidget(chartView);
             }
-            //logger.log(message);
         }
     }
     else
@@ -231,35 +244,27 @@ void MainWindow::on_actionT_rl_s_triggered()
 	{
 		QTreeWidgetItem* child = tw->selectedItems().at(0);
 		QString parent = child->parent()->text(0);
-        std::function<bool(QString&)> toExecute;
-		if (queries::TABLES == parent)
-		{
-            toExecute = [&](QString& failMessage) {
-				bool success = db.exec(QString("DROP TABLE %1").arg(child->text(0))).isActive();
-				failMessage = db.lastError().text();
-				return success; };
-		}
-		else if (queries::INDEXES == parent)
-		{
-            toExecute = [&](QString& failMessage) {
-				bool success = db.exec(QString("DROP INDEX %1").arg(child->text(0))).isActive();
-				failMessage = db.lastError().text();
-				return success; };
-		}
-		else if (queries::VIEWS == parent)
-		{
-            toExecute = [&](QString& failMessage) {
-				bool success = db.exec(QString("DROP VIEW %1").arg(child->text(0))).isActive();
-				failMessage = db.lastError().text();
-				return success; };
-		}
-		else if (queries::FUNCTIONS == parent)
-		{
-            toExecute = [&](QString& failMessage) {
-				bool success = db.exec(QString("DROP FUNCTION %1").arg(child->text(0))).isActive();
-				failMessage = db.lastError().text();
-				return success; };
-		}
+        std::function<bool(QString&)> toExecute = [&](QString& failMessage) {
+            bool success = false;
+            if (queries::TABLES == parent)
+            {
+                success = db.exec(QString("DROP TABLE %1").arg(child->text(0))).isActive();
+            }
+            else if (queries::INDEXES == parent)
+            {
+                success = db.exec(QString("DROP INDEX %1").arg(child->text(0))).isActive();
+            }
+            else if (queries::VIEWS == parent)
+            {
+                success = db.exec(QString("DROP VIEW %1").arg(child->text(0))).isActive();
+            }
+            else if (queries::FUNCTIONS == parent)
+            {
+                success = db.exec(QString("DROP FUNCTION %1").arg(child->text(0))).isActive();
+            }
+            failMessage = db.lastError().text();
+            return success;
+        };
         logger.logWithTime("Adatbázisban található objektum sikeresen törölve."
                            , "Hiba történt a törlés végrehajtása közben!", toExecute);
 		delete child;
@@ -322,6 +327,12 @@ void MainWindow::on_actionMegtekint_s_triggered()
                 model->setQuery(*q);
                 QTableView *view = new QTableView(ui->tWUpper);
                 view->setModel(model);
+                const auto& colCount = model->columnCount();
+                const auto width = ui->tWUpper->width() - 20;
+                for (auto i = 0; i < colCount; ++i)
+                {
+                    view->setColumnWidth(i, width / colCount);
+                }
                 view->show();
                 ui->tWUpper->addTab(view, child->text(0));
                 ui->tWUpper->setCurrentWidget(view);

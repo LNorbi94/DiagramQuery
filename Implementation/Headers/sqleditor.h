@@ -15,6 +15,8 @@
 
 #include <QChartView>
 #include <QPieSeries>
+#include <QBarSeries>
+#include <QBarSet>
 #include <QPieSlice>
 #include <QGraphicsLayout>
 

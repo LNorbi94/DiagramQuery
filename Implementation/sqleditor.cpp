@@ -55,10 +55,11 @@ bool SqlEditor::makeChart(QString& message
     {
         QT_CHARTS_USE_NAMESPACE
         auto byIterator = std::find(queryInWords->begin(), queryInWords->end(), "BY");
-        ++byIterator;
-        QRegExp regexp("\\((.)*");
+        //if (byIterator != QStringList::npos)
+            ++byIterator;
+        const QRegExp regexp("\\((.)*");
         regexp.indexIn(query);
-        QString queryToExecute = regexp.capturedTexts().at(0);
+        const QString queryToExecute = regexp.capturedTexts().at(0);
         q->exec(queryToExecute);
 
         if (!q->isActive())
@@ -69,13 +70,19 @@ bool SqlEditor::makeChart(QString& message
         {
             message = "A diagram működéséhez 2 oszlop szükséges.";
         }
+        else if (q->next() && !q->value(1).toInt())
+        {
+            message = "Második oszlopnak számot kell tartalmaznia!";
+        }
         else
         {
+            q->previous();
             QPieSeries* series = new QPieSeries();
 
             while (q->next())
             {
-                series->append(q->value(0).toString(), q->value(1).toInt());
+                series->append(QString("%1 (%2)").arg(q->value(0).toString()).arg(q->value(1).toInt())
+                               , q->value(1).toInt());
             }
 
             chart->addSeries(series);
@@ -86,6 +93,53 @@ bool SqlEditor::makeChart(QString& message
 
             ret = true;
         }
+    } else if ("BARCHART" == chart_type)
+    {
+        QT_CHARTS_USE_NAMESPACE
+        auto byIterator = std::find(queryInWords->begin(), queryInWords->end(), "BY");
+        //if (byIterator != QStringList::npos)
+            ++byIterator;
+        const QRegExp regexp("\\((.)*");
+        regexp.indexIn(query);
+        const QString queryToExecute = regexp.capturedTexts().at(0);
+        q->exec(queryToExecute);
+
+        if (!q->isActive())
+        {
+            message = q->lastError().text();
+        }
+        else if (q->record().count() != 2)
+        {
+            message = "A diagram működéséhez 2 oszlop szükséges.";
+        }
+        else if (q->next() && !q->value(1).toInt())
+        {
+            message = "Második oszlopnak számot kell tartalmaznia!";
+        }
+        else
+        {
+            q->previous();
+            QBarSeries* series = new QBarSeries();
+
+            while (q->next())
+            {
+                QBarSet* temp = new QBarSet(q->value(0).toString());
+                *temp << q->value(1).toInt() << 10;
+                series->append(temp);
+            }
+
+            chart->addSeries(series);
+            chart->setTitle("Diagram rendezve a(z) " + *byIterator + " oszlop alapján.");
+            chart->layout()->setContentsMargins(0, 0, 0, 0);
+            chart->setTheme(QChart::ChartThemeDark);
+            chart->setAnimationOptions(QChart::AllAnimations);
+
+            ret = true;
+        }
+    }
+    else
+    {
+        message = "Nem támogatott diagram típus: " + chart_type;
     }
     return ret;
 }
