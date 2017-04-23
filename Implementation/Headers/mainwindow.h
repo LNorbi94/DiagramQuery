@@ -11,6 +11,11 @@
 #include <QTextEdit>
 #include <QPlainTextEdit>
 #include <QShortcut>
+#include <QFormLayout>
+#include <QLabel>
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QLineEdit>
 
 #include <QTableView>
 #include <QSqlDatabase>
@@ -35,29 +40,29 @@
 
 namespace Ui
 {
-	class MainWindow;
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	MainWindow(QWidget *parent) = delete;
-	MainWindow(QSqlDatabase& db, QWidget* parent = nullptr);
-	~MainWindow();
+    MainWindow(QWidget *parent) = delete;
+    MainWindow(QSqlDatabase& db, QWidget* parent = nullptr);
+    ~MainWindow();
 
 private slots:
-	void on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int column);
-	void on_tWUpper_tabCloseRequested(int index);
+    void on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int column);
+    void on_tWUpper_tabCloseRequested(int index);
     void on_tWLower_tabCloseRequested(int index);
 
-	void on_actionT_rl_s_triggered();
-	void on_actionKil_p_s_triggered()
-	{
-		this->close();
-		this->destroy();
-	}
+    void on_actionT_rl_s_triggered();
+    void on_actionKil_p_s_triggered()
+    {
+        this->close();
+        this->destroy();
+    }
 
     void on_actionMegtekint_s_triggered();
 
@@ -78,6 +83,8 @@ private slots:
         QString query = queries->extractQuery();
         executeString(query);
     }
+
+    void on_action_jrakapcsol_d_s_triggered();
 
 private:
     bool fillList(QTreeWidgetItem* list, const QString& queryToExecute) noexcept;
@@ -101,8 +108,8 @@ private:
     void registerShortcuts();
 
     DBLogger& logger;
-	Ui::MainWindow* ui;
-	QSqlDatabase& db;
+    Ui::MainWindow* ui;
+    QSqlDatabase& db;
     QProgressBar* progressBar;
     SqlEditor* queries;
 };

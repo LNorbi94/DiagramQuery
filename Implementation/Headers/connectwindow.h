@@ -32,7 +32,7 @@ public:
     explicit ConnectWindow(QWidget* parent = nullptr);
 	~ConnectWindow();
 
-	void fillConnectionList();
+    void fillConnectionList() noexcept;
 
 private slots:
 	void on_pbConnect_clicked();

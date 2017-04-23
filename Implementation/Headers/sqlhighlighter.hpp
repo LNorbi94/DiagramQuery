@@ -9,7 +9,7 @@ class SqlHighlighter : public QSyntaxHighlighter
 	Q_OBJECT
 
 public:
-	SqlHighlighter(QTextDocument* parent = nullptr);
+    explicit SqlHighlighter(QTextDocument* parent = nullptr);
 
 protected:
 	void highlightBlock(const QString& text) override;

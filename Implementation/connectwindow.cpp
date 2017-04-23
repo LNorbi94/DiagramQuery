@@ -7,15 +7,18 @@ ConnectWindow::ConnectWindow(QWidget* parent) :
 {
     ui->setupUi(this);
     fillConnectionList();
-    QShortcut * shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), ui->lwConnections);
-    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(deleteConnection()));
+    QShortcut * shortcut = new QShortcut(QKeySequence(Qt::Key_Delete)
+                                         , ui->lwConnections);
+    QObject::connect(shortcut, &QShortcut::activated
+                     , this, &ConnectWindow::deleteConnection);
 }
 
 /**
- **  Fills ListWidget with connections (with xml extension) from default configfolder.
+ **  Fills ListWidget with connections (with xml extension)
+ **  from default config folder.
  **  It also clears the ListWidget before inserting.
  */
-void ConnectWindow::fillConnectionList()
+void ConnectWindow::fillConnectionList() noexcept
 {
 	ui->lwConnections->clear();
 	QDir dir(connections::CONFIGFOLDER);
@@ -50,7 +53,7 @@ void ConnectWindow::deleteConnection()
 
 void ConnectWindow::on_pbConnect_clicked()
 {
-	QSqlDatabase* db = new QSqlDatabase(QSqlDatabase::addDatabase("QOCI"));
+    QSqlDatabase* db = new QSqlDatabase(QSqlDatabase::addDatabase("QOCI"));
 	db->setHostName(ui->lEHost->text());
 	db->setDatabaseName(ui->lEService->text());
     db->setPort(ui->lEPort->text().toInt());
@@ -125,7 +128,8 @@ void ConnectWindow::on_pbSave_clicked()
 	input.setWindowTitle("Kapcsolat mentése");
 	input.setOkButtonText("Mentés");
 	input.setCancelButtonText("Mégse");
-	input.setLabelText("Kérem írja be milyen néven kívánja menteni a kapcsolatot!");
+    input.setLabelText(
+                "Kérem írja be milyen néven kívánja menteni a kapcsolatot!");
 	input.setBaseSize(QSize(200, 100));
 	if (input.exec())
 	{
@@ -140,7 +144,8 @@ void ConnectWindow::on_pbSave_clicked()
 			QMessageBox::warning(
 				this
 				, tr("Név megadása")
-				, tr("Kérem adjon meg egy nevet, amivel később majd el lehet érni a kapcsolatot!"));
+                , tr("Kérem adjon meg egy nevet, amivel később \
+                      majd el lehet érni a kapcsolatot!"));
 		}
 		else
 		{
@@ -153,7 +158,8 @@ void ConnectWindow::on_pbSave_clicked()
 				QMessageBox::warning(
 					this
 					, tr("Létező név")
-					, tr("Már létezik kapcsolat ilyen névvel! Kérem adjon meg más nevet."));
+                    , tr("Már létezik kapcsolat ilyen névvel! \
+                          Kérem adjon meg más nevet."));
 			}
 			else
 			{

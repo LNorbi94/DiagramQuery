@@ -1,9 +1,11 @@
 ﻿#include "Headers/sqlhighlighter.hpp"
 
 /*
- * Keywords from: https://docs.oracle.com/database/121/SQLRF/ap_keywd001.htm#SQLRF55621 .
+ * Keywords from:
+ * https://docs.oracle.com/database/121/SQLRF/ap_keywd001.htm#SQLRF55621 .
  * They are for oracle sql.
- * Functions from: http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions001.htm .
+ * Functions from:
+ * http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions001.htm .
  */
 SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 	: QSyntaxHighlighter(parent)
@@ -74,18 +76,26 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 					<< "\\btan\\b" << "\\btanh\\b" << "\\btrunc\\b"
 					<< "\\bwidth_bucket\\b" << "\\bchr\\b" << "\\bconcat\\b"
 					<< "\\binitcap\\b" << "\\blower\\b" << "\\blpad\\b"
-					<< "\\bltrim\\b" << "\\bnls_initcap\\b" << "\\bnls_lower\\b"
-					<< "\\bnlssort\\b" << "\\bnls_upper\\b" << "\\bregexp_replace\\b"
+                    << "\\bltrim\\b" << "\\bnls_initcap\\b"
+                    << "\\bnls_lower\\b"
+                    << "\\bnlssort\\b" << "\\bnls_upper\\b"
+                    << "\\bregexp_replace\\b"
                     << "\\bregexp_substr\\b" << "\\brpad\\b"
 					<< "\\brtrim\\b" << "\\bsoundex\\b" << "\\bsubstr\\b"
 					<< "\\btranslate\\b" << "\\btreat\\b" << "\\btrim\\b"
-					<< "\\bupper\\b" << "\\bnls_charset_decl_len\\b" << "\\bnls_charset_id\\b"
-					<< "\\bnls_charset_name\\b" << "\\bascii\\b" << "\\binstr\\b"
-					<< "\\blength\\b" << "\\bregexp_instr\\b" << "\\badd_months\\b"
-					<< "\\bcurrent_date\\b" << "\\bcurrent_timestamp\\b" << "\\bdbtimezone\\b"
+                    << "\\bupper\\b" << "\\bnls_charset_decl_len\\b"
+                    << "\\bnls_charset_id\\b"
+                    << "\\bnls_charset_name\\b" << "\\bascii\\b"
+                    << "\\binstr\\b"
+                    << "\\blength\\b" << "\\bregexp_instr\\b"
+                    << "\\badd_months\\b"
+                    << "\\bcurrent_date\\b" << "\\bcurrent_timestamp\\b"
+                    << "\\bdbtimezone\\b"
 					<< "\\bextract\\b" << "\\bfrom_tz\\b" << "\\blast_day\\b"
-					<< "\\blocaltimestamp\\b" << "\\bmonths_between\\b" << "\\bnew_time\\b"
-					<< "\\bnext_day\\b" << "\\bnumtodsinterval\\b" << "\\bnumtoyminterval\\b"
+                    << "\\blocaltimestamp\\b" << "\\bmonths_between\\b"
+                    << "\\bnew_time\\b"
+                    << "\\bnext_day\\b" << "\\bnumtodsinterval\\b"
+                    << "\\bnumtoyminterval\\b"
 					<< "\\bround\\b" << "\\bsessiontimezone\\b" << "\\bsys_extract_utc\\b"
 					<< "\\bsysdate\\b" << "\\bsystimestamp\\b" << "\\bto_char\\b"
 					<< "\\bto_timestamp\\b" << "\\bto_timestamp_tz\\b" << "\\bto_dsinterval\\b"
@@ -146,7 +156,7 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
                     << "\\bmake\\b" << "\\bchart\\b" << "\\bpiechart\\b"
                     << "\\bbarchart\\b";
 	rule.format = _functionForm;
-	for (auto& pattern : keywordPatterns)
+    for (const auto& pattern : keywordPatterns)
 	{
 		rule.pattern = QRegExp(pattern);
 		_rules.append(rule);

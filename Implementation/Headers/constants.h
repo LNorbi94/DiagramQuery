@@ -12,27 +12,33 @@ namespace queries
 {
 	const QString TABLES = QString::fromUtf8("Táblák");
     const QString GET_TABLES = "SELECT object_name FROM dba_objects \
-	WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";
-	const QString GET_TABLES_COUNT = "SELECT COUNT(*) FROM user_objects \
-	WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";
+    WHERE object_type = 'TABLE' AND object_name NOT LIKE '%$%'";
 
 	const QString INDEXES = QString::fromUtf8("Indexek");
 	const QString GET_INDEXES = "SELECT object_name FROM user_objects \
-	WHERE object_type = 'INDEX' AND object_name NOT LIKE '%$%'";
-	const QString GET_INDEXES_COUNT = "SELECT COUNT(*) FROM user_objects \
-	WHERE object_type = 'INDEX' AND object_name NOT LIKE '%$%'";
+    WHERE object_type = 'INDEX' AND object_name NOT LIKE '%$%'";
 
 	const QString VIEWS = QString::fromUtf8("Nézetek");
 	const QString GET_VIEWS = "SELECT object_name FROM user_objects \
-	WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
-	const QString GET_VIEWS_COUNT = "SELECT COUNT(*) FROM user_objects \
-	WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
+    WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
 
 	const QString FUNCTIONS = QString::fromUtf8("Függvények");
 	const QString GET_FUNCTIONS = "SELECT object_name FROM user_objects \
-	WHERE object_type = 'FUNCTION' AND object_name NOT LIKE '%$%'";
-	const QString GET_FUNCTIONS_COUNT = "SELECT COUNT(*) FROM user_objects \
-	WHERE object_type = 'FUNCTION' AND object_name NOT LIKE '%$%'";
+    WHERE object_type = 'FUNCTION' AND object_name NOT LIKE '%$%'";
+
+    const QString SELECT_TABLES = "SELECT column_name, data_type, data_length, \
+            data_precision, nullable FROM user_tab_columns\
+            WHERE table_name = '%1'";
+
+    const auto SELECT_INDEXES = [](QString name) { return QString("SELECT index_type, table_owner, table_name \
+            , uniqueness FROM user_indexes WHERE index_name = '%1'").arg(name); };
+
+    const QString SELECT_VIEWS = "SELECT text, view_type, read_only \
+                                    FROM user_views WHERE view_name = '%1'";
+
+    const QString SELECT_FUNCTIONS = "SELECT object_name, object_id, created \
+            FROM user_objects WHERE UPPER(OBJECT_TYPE) = 'FUNCTION' AND \
+            object_name = '%1'";
 }
 
 #endif // !CONSTANTS_H

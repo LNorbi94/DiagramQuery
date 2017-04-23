@@ -3,18 +3,18 @@
 #include <iostream>
 
 MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
-	QMainWindow(parent)
+    QMainWindow(parent)
   , logger(*new DBLogger)
 	, ui(new Ui::MainWindow)
     , db(database)
 {
     ui->setupUi(this);
 
-	progressBar = new QProgressBar(ui->statusBar);
-	progressBar->setRange(0, 100);
-	progressBar->setValue(0);
-	progressBar->setMaximumSize(150, 18);
-	logger.setProgressBar(progressBar);
+    progressBar = new QProgressBar(ui->statusBar);
+    progressBar->setRange(0, 100);
+    progressBar->setValue(0);
+    progressBar->setMaximumSize(150, 18);
+    logger.setProgressBar(progressBar);
 
 	ui->mainSplitter->setSizes({ 150, 600 });
 	ui->splitter->setSizes({ 400, 200 });
@@ -24,8 +24,8 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
 	SqlHighlighter * highLighter = new SqlHighlighter();
 	highLighter->setDocument(queries->document());
 	QString dbName = db.hostName();
-	ui->tWUpper->addTab(queries, dbName);
-    queries->setText("MAKE CHART PIECHART ( SELECT department_id, COUNT(*) FROM employees GROUP BY department_id );");
+    ui->tWUpper->addTab(queries, dbName);
+    queries->load("/home/lestarn/Documents/QueryCreator/Tests/Test01.sql");
 
 	QTreeWidget * treeWidget = ui->trWLeft;
 	treeWidget->setColumnCount(1);
@@ -42,8 +42,8 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
 	treeWidget->setHeaderLabel(dbName);
 	ui->statusBar->addPermanentWidget(progressBar, 0);
 
-	ui->tWLower->addTab(&logger, "Adatbázis log");
-	logger.appendPlainText("Sikeresen csatlakozva az adatbázishoz!");
+    ui->tWLower->addTab(&logger, "Adatbázis log");
+    logger.appendPlainText("Sikeresen csatlakozva az adatbázishoz!");
 
 	ui->tWUpper->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
     ui->tWLower->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
@@ -94,7 +94,7 @@ void MainWindow::registerShortcuts()
     QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(showExecutionPlan()));
 
     shortcut = new QShortcut(QKeySequence(Qt::Key_F3), queries);
-    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(executeSelection()));
+    QObject::connect(shortcut, &QShortcut::activated, this, &MainWindow::executeSelection);
 }
 
 void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int /*column*/)
@@ -110,7 +110,7 @@ void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int /*colum
         toExecute = [&] (QString& /*failMessage*/) { return fillIndexList(item); };
 	}
 	else if (queries::VIEWS == item->text(0))
-	{
+    {
         toExecute = [&] (QString& /*failMessage*/) { return fillViewList(item); };
 	}
 	else if (queries::FUNCTIONS == item->text(0))
@@ -122,12 +122,8 @@ void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int /*colum
         on_actionMegtekint_s_triggered();
         return;
     }
-
-    std::thread t([&] {
-        logger.logWithTime("Adatbázisban található objektumok sikeresen lekérdezve."
-                           , "Hiba történt a lekérdezés végrehajtása közben!", toExecute);
-    });
-    t.join();
+    logger.logWithTime("Adatbázisban található objektumok sikeresen lekérdezve."
+                       , "Hiba történt a lekérdezés végrehajtása közben!", toExecute);
 }
 
 void MainWindow::showExecutionPlan()
@@ -139,14 +135,14 @@ void MainWindow::showExecutionPlan()
 		bool success = q->exec(explainPlan);
 		if (success)
 		{
-            //success = q->exec("SELECT cardinality \"Rows\", \
+            /*success = q->exec("SELECT cardinality \"Rows\", \
 				lpad(' ',level-1)||operation||' '||options||' '||object_name \"Plan\" \
 				FROM PLAN_TABLE \
 				CONNECT BY prior id = parent_id \
 				AND prior statement_id = statement_id \
 				START WITH id = 0 \
 				AND statement_id = 'temp1' \
-                ORDER BY id");
+                ORDER BY id");*/
              success =     q->exec("SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())");
 			if (success)
 			{
@@ -182,12 +178,12 @@ void MainWindow::executeString(const QString& query)
             failMessage = q->lastError().text();
             return q->isActive(); };
 
-    QStringList* words = new QStringList(query.split(' '));
-    for (auto& i : *words)
+	QStringList words = QStringList(query.split(' '));
+	for (auto& i : words)
     {
         i = i.toUpper();
     }
-    if ("SELECT" == words->at(0))
+	if ("SELECT" == words.at(0))
     {
         bool success = logger.logWithTime("Lekérdezés sikeresen végrehajtva!", "Lekérdezés sikertelen.", toExecute);
         if (success)
@@ -201,9 +197,9 @@ void MainWindow::executeString(const QString& query)
             ui->tWLower->setCurrentWidget(view);
         }
     }
-    else if ("MAKE" == words->at(0))
+	else if ("MAKE" == words.at(0))
     {
-        if ("CHART" == words->at(1))
+		if ("CHART" == words.at(1))
         {
             QString message;
             QT_CHARTS_USE_NAMESPACE
@@ -213,14 +209,17 @@ void MainWindow::executeString(const QString& query)
             {
                 success = queries->makeChart(msg
                                    , chart
-                                   , words
+				                   , &words
                                    , query
                                    , q);
                 message = msg;
+				delete q;
                 return success;
             };
 
-            logger.logWithTime("Diagram sikeresen létrehozva!", "Diagram létrehozása közben hiba történt.", toExecute);
+            logger.logWithTime("Diagram sikeresen létrehozva!"
+                               , "Diagram létrehozása közben hiba történt."
+                               , toExecute);
 
             if (success)
             {
@@ -233,7 +232,8 @@ void MainWindow::executeString(const QString& query)
     }
     else
     {
-        logger.logWithTime("Művelet sikeresen végrehajtva.", "Művelet sikertelen.", toExecute);
+        logger.logWithTime("Művelet sikeresen végrehajtva."
+                           , "Művelet sikertelen.", toExecute);
     }
 }
 
@@ -248,25 +248,30 @@ void MainWindow::on_actionT_rl_s_triggered()
             bool success = false;
             if (queries::TABLES == parent)
             {
-                success = db.exec(QString("DROP TABLE %1").arg(child->text(0))).isActive();
+                success = db.exec(QString("DROP TABLE %1")
+                                  .arg(child->text(0))).isActive();
             }
             else if (queries::INDEXES == parent)
             {
-                success = db.exec(QString("DROP INDEX %1").arg(child->text(0))).isActive();
+                success = db.exec(QString("DROP INDEX %1")
+                                  .arg(child->text(0))).isActive();
             }
             else if (queries::VIEWS == parent)
             {
-                success = db.exec(QString("DROP VIEW %1").arg(child->text(0))).isActive();
+                success = db.exec(QString("DROP VIEW %1")
+                                  .arg(child->text(0))).isActive();
             }
             else if (queries::FUNCTIONS == parent)
             {
-                success = db.exec(QString("DROP FUNCTION %1").arg(child->text(0))).isActive();
+                success = db.exec(QString("DROP FUNCTION %1")
+                                  .arg(child->text(0))).isActive();
             }
             failMessage = db.lastError().text();
             return success;
         };
         logger.logWithTime("Adatbázisban található objektum sikeresen törölve."
-                           , "Hiba történt a törlés végrehajtása közben!", toExecute);
+                           , "Hiba történt a törlés végrehajtása közben!"
+                           , toExecute);
 		delete child;
 	}
 }
@@ -285,8 +290,7 @@ void MainWindow::on_actionMegtekint_s_triggered()
             if (queries::TABLES == parent)
             {
                 toExecute = [&](QString& failMessage) {
-                    bool success = q->exec(QString("SELECT column_name, data_type \
-                                                   , data_length, data_precision, nullable FROM user_tab_columns WHERE table_name = '%1'")
+                    bool success = q->exec(QString(queries::SELECT_TABLES)
                             .arg(child->text(0)));
                     failMessage = q->lastError().text();
                     return success; };
@@ -294,16 +298,14 @@ void MainWindow::on_actionMegtekint_s_triggered()
             else if (queries::INDEXES == parent)
             {
                 toExecute = [&](QString& failMessage) {
-                    bool success = q->exec(QString("SELECT index_type, table_owner, table_name \
-                                                   , uniqueness FROM user_indexes WHERE index_name = '%1'")
-                            .arg(child->text(0)));
+                    bool success = q->exec(queries::SELECT_INDEXES(child->text(0)));
                     failMessage = q->lastError().text();
                     return success; };
             }
             else if (queries::VIEWS == parent)
             {
                 toExecute = [&](QString& failMessage) {
-                    bool success = q->exec(QString("SELECT text, view_type, read_only FROM user_views WHERE view_name = '%1'")
+                    bool success = q->exec(QString(queries::SELECT_VIEWS)
                                            .arg(child->text(0)));
                     failMessage = db.lastError().text();
                     return success; };
@@ -312,24 +314,24 @@ void MainWindow::on_actionMegtekint_s_triggered()
             {
                 toExecute = [&](QString& failMessage)
                 {
-                    bool success = q->exec(QString("SELECT object_name, object_id, created \
-                                                   FROM user_objects WHERE UPPER(OBJECT_TYPE) = 'FUNCTION' AND object_name = '%1'")
+                    bool success = q->exec(queries::SELECT_FUNCTIONS
                                            .arg(child->text(0)));
                     failMessage = q->lastError().text();
                     return success;
                 };
             }
             logger.logWithTime("Adatbázisban található objektum sikeresen lekérdezve."
-                               , "Hiba történt a lekérdezés végrehajtása közben!", toExecute);
+                               , "Hiba történt a lekérdezés végrehajtása közben!"
+                               , toExecute);
             if (q->isActive())
             {
                 QSqlQueryModel* model = new QSqlQueryModel;
                 model->setQuery(*q);
                 QTableView *view = new QTableView(ui->tWUpper);
                 view->setModel(model);
-                const auto& colCount = model->columnCount();
-                const auto width = ui->tWUpper->width() - 20;
-                for (auto i = 0; i < colCount; ++i)
+                const int colCount = model->columnCount();
+                const int width = ui->tWUpper->width() - 20;
+                for (int i = 0; i < colCount; ++i)
                 {
                     view->setColumnWidth(i, width / colCount);
                 }
@@ -347,7 +349,7 @@ MainWindow::~MainWindow()
 	delete ui;
 	delete progressBar;
 	delete queries;
-	delete &db;
+    delete &db;
 	delete &logger;
 }
 
@@ -370,4 +372,37 @@ void MainWindow::on_actionBet_lt_s_triggered()
 void MainWindow::on_actionMent_s_triggered()
 {
     queries->save();
+}
+
+void MainWindow::on_action_jrakapcsol_d_s_triggered()
+{
+    QDialog dialog(this);
+    // Use a layout allowing to have a label next to each field
+    QFormLayout form(&dialog);
+
+    // Add some text above the fields
+    form.addRow(new QLabel(tr("Kérem adja meg újra a felhasználónevét és jelszavát!")));
+
+    QLineEdit* userName = new QLineEdit(&dialog);
+    form.addRow(tr("Felhasználónév: "), userName);
+
+    QLineEdit* password = new QLineEdit(&dialog);
+    password->setEchoMode(QLineEdit::Password);
+    form.addRow(tr("Jelszó: "), password);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
+    buttonBox.button(QDialogButtonBox::Ok)->setText(tr("Kapcsolódás"));
+    buttonBox.button(QDialogButtonBox::Cancel)->setText(tr("Mégse"));
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted
+                     , &dialog, &QDialog::accept);
+    QObject::connect(&buttonBox, &QDialogButtonBox::rejected
+                     , &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        db.close();
+        //db.open(userName->text(), password->text());
+    }
 }

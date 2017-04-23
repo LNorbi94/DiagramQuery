@@ -20,24 +20,32 @@
 #include <QPieSlice>
 #include <QGraphicsLayout>
 
+#include <iostream>
+
 class SqlEditor : public QTextEdit
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	SqlEditor(QWidget* parent = nullptr) : QTextEdit(parent) { }
+    explicit SqlEditor(QWidget* parent = nullptr) : QTextEdit(parent)
+    {
+        connect(this, &SqlEditor::cursorPositionChanged
+                , this, &SqlEditor::highlightCurrentLine);
+    }
 
-	QString extractQuery();
+    QString extractQuery() noexcept;
 
-    void save();
-    void load();
+    void save() const;
+    void load(const QString& filename = "");
 
     bool makeChart(QString& message
-                                                        , QtCharts::QChart* chart
-                                                        , QStringList *queryInWords
-                                                        , QString query
-                                                        , QSqlQuery* q);
-private:
+                , QtCharts::QChart* chart
+                , QStringList *queryInWords
+                , QString query
+                , QSqlQuery* q);
+
+private slots:
+    void highlightCurrentLine();
 
 };
 

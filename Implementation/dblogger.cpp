@@ -1,25 +1,29 @@
 #include "Headers/dblogger.hpp"
 
-bool DBLogger::logWithTime(const QString & success, const QString& fail, std::function<bool(QString&)>& slowFunc)
+bool DBLogger::logWithTime(const QString & success, const QString& fail
+                           , std::function<bool(QString&)>& slowFunc)
 {
-	QElapsedTimer timer;
+    QElapsedTimer timer;
     qint64 elapsedTime = 0;
-	timer.start();
+    progressBar->setValue(100);
     progressBar->setRange(0, 0);
-	QString errorMessage;
-	bool ret = false;
+    timer.start();
+    QString errorMessage;
+    bool ret = false;
     if ((ret = slowFunc(errorMessage)))
-	{
-		elapsedTime = timer.elapsed();
-		appendPlainText(success);
-		appendPlainText(QString::fromUtf8("A művelet végrehajtva %1 ms alatt.").arg(elapsedTime));
-	}
-	else
-	{
-		appendPlainText(fail);
+    {
+        elapsedTime = timer.elapsed();
+        appendPlainText(success);
+        appendPlainText(QString::fromUtf8("A művelet végrehajtva %1 ms alatt.")
+                        .arg(elapsedTime));
+    }
+    else
+    {
+        appendPlainText(fail);
         appendPlainText(errorMessage);
-	}
+    }
     progressBar->setRange(0, 100);
+    progressBar->setValue(0);
     return ret;
 }
 

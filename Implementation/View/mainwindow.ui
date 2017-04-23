@@ -20,7 +20,8 @@
    <string>QueryCreator</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="SP_TitleBarMenuButton"/>
+   <iconset theme="SP_TitleBarMenuButton">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -79,7 +80,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuF_jl">
@@ -98,7 +99,16 @@
     <addaction name="actionMegtekint_s"/>
     <addaction name="actionT_rl_s"/>
    </widget>
+   <widget class="QMenu" name="menuAdatb_zis">
+    <property name="title">
+     <string>Adatbázis</string>
+    </property>
+    <addaction name="action_jrakapcsol_d_s"/>
+    <addaction name="separator"/>
+    <addaction name="action_j_kapcsolat"/>
+   </widget>
    <addaction name="menuF_jl"/>
+   <addaction name="menuAdatb_zis"/>
    <addaction name="menuAdatb_zis_Objektum"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -108,31 +118,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
-   </property>
-  </action>
-  <action name="action_j_lap">
-   <property name="text">
-    <string>Új lap</string>
-   </property>
-  </action>
-  <action name="actionT_bla">
-   <property name="text">
-    <string>Tábla</string>
-   </property>
-  </action>
-  <action name="actionIndex">
-   <property name="text">
-    <string>Index</string>
-   </property>
-  </action>
-  <action name="actionN_zet">
-   <property name="text">
-    <string>Nézet</string>
-   </property>
-  </action>
-  <action name="actionF_ggv_ny">
-   <property name="text">
-    <string>Függvény</string>
    </property>
   </action>
   <action name="actionMegtekint_s">
@@ -153,6 +138,16 @@
   <action name="actionMent_s">
    <property name="text">
     <string>Lap mentése</string>
+   </property>
+  </action>
+  <action name="action_jrakapcsol_d_s">
+   <property name="text">
+    <string>Újrakapcsolódás</string>
+   </property>
+  </action>
+  <action name="action_j_kapcsolat">
+   <property name="text">
+    <string>Új kapcsolat</string>
    </property>
   </action>
  </widget>
