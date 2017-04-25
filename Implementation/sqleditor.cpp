@@ -5,6 +5,7 @@ QString SqlEditor::extractQuery() noexcept
 	QTextCursor cursor(textCursor());
 
     // plsql block: declare, begin, create
+    // comments
 
     bool plSql = false;
     bool atEnd;
@@ -28,17 +29,11 @@ QString SqlEditor::extractQuery() noexcept
 
     atEnd = plSql = text.contains('/');
 
-    std::cerr << text.toStdString();
-
     while(cursor.movePosition(QTextCursor::PreviousWord
-                              , QTextCursor::KeepAnchor) && !plSql && !exit)
+                              , QTextCursor::KeepAnchor) && !exit)
     {
         text = cursor.selectedText().toUpper();
-        for (const QString& w : plsqlWords)
-        {
-            plSql = plSql || text.contains(w);
-        }
-        exit = text.contains("/");
+        exit = text.contains("/") || text.contains(tokens::EMPTY_LINE);
     }
 
     if (!plSql)
@@ -79,14 +74,16 @@ QString SqlEditor::extractQuery() noexcept
             const QString selectedText = cursor.selectedText().toUpper();
             exit = selectedText.contains('/');
             if (atEnd)
-                exit = selectedText.contains(QRegExp("\u2029\\s*\u2029"));
+                exit = selectedText.contains(tokens::EMPTY_LINE);
         }
 
         setTextCursor(cursor);
-        QString query = cursor.selectedText().simplified();
+        QString query = cursor.selectedText();
+        query = query.remove(QRegExp("--[^\u2029]*"));
+        query = query.remove(QRegExp("/\\*([^/]|[^*]/)*\\*/"));
         query = query.remove('/');
-        query = query.remove(QRegExp("--([^\\s]| )*"));
-        return query;
+        std::cerr << query.simplified().toStdString() << std::endl;
+        return query.simplified();
     }
 }
 

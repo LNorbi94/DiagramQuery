@@ -16,85 +16,87 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     progressBar->setMaximumSize(150, 18);
     logger.setProgressBar(progressBar);
 
-	ui->mainSplitter->setSizes({ 150, 600 });
-	ui->splitter->setSizes({ 400, 200 });
+    ui->mainSplitter->setSizes({ 150, 600 });
+    ui->splitter->setSizes({ 400, 200 });
 
     queries = new SqlEditor(ui->tWUpper);
-	queries->setFont(QFont("Segoe UI", 11));
-	SqlHighlighter * highLighter = new SqlHighlighter();
-	highLighter->setDocument(queries->document());
-	QString dbName = db.hostName();
+    queries->setFont(QFont("Segoe UI", 11));
+    SqlHighlighter * highLighter = new SqlHighlighter();
+    highLighter->setDocument(queries->document());
+    QString dbName = db.hostName();
     ui->tWUpper->addTab(queries, dbName);
-    queries->load("/home/lestarn/Documents/QueryCreator/Tests/Test01.sql");
+    queries->load("/home/lestarn/Documents/QueryCreator/Tests/Test02.sql");
 
-	QTreeWidget * treeWidget = ui->trWLeft;
-	treeWidget->setColumnCount(1);
-	QList<QTreeWidgetItem *> items;
-	QTreeWidgetItem * tables	= new QTreeWidgetItem(QStringList(queries::TABLES));
-	QTreeWidgetItem * indexes	= new QTreeWidgetItem(QStringList(queries::INDEXES));
-	QTreeWidgetItem * views		= new QTreeWidgetItem(QStringList(queries::VIEWS));
-	QTreeWidgetItem * functions = new QTreeWidgetItem(QStringList(queries::FUNCTIONS));
-	items.append(tables);
-	items.append(indexes);
-	items.append(views);
-	items.append(functions);
-	treeWidget->insertTopLevelItems(0, items);
-	treeWidget->setHeaderLabel(dbName);
-	ui->statusBar->addPermanentWidget(progressBar, 0);
+    QTreeWidget * treeWidget = ui->trWLeft;
+    treeWidget->setColumnCount(1);
+    QList<QTreeWidgetItem *> items;
+    QTreeWidgetItem * tables    = new QTreeWidgetItem(
+                QStringList(queries::TABLES));
+    QTreeWidgetItem * indexes   = new QTreeWidgetItem(
+                QStringList(queries::INDEXES));
+    QTreeWidgetItem * views     = new QTreeWidgetItem(
+                QStringList(queries::VIEWS));
+    QTreeWidgetItem * functions = new QTreeWidgetItem(
+                QStringList(queries::FUNCTIONS));
+    items.append(tables);
+    items.append(indexes);
+    items.append(views);
+    items.append(functions);
+    treeWidget->insertTopLevelItems(0, items);
+    treeWidget->setHeaderLabel(dbName);
+    ui->statusBar->addPermanentWidget(progressBar, 0);
 
     ui->tWLower->addTab(&logger, "Adatbázis log");
     logger.appendPlainText("Sikeresen csatlakozva az adatbázishoz!");
 
-	ui->tWUpper->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
+    ui->tWUpper->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
     ui->tWLower->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 
     registerShortcuts();
 }
 
 
-bool MainWindow::fillList(QTreeWidgetItem* list, const QString& queryToExecute) noexcept
+bool MainWindow::fillList(QTreeWidgetItem* list
+                          , const QString& queryToExecute) noexcept
 {
-    //setUpdatesEnabled(false);
-    QList<QTreeWidgetItem*> items;
-    //QFuture<void> aSyncCall = QtConcurrent::run([&] {
-    QSqlQuery query = db.exec(queryToExecute);
-    if (!query.isActive())
-	{
-        // return false;
-	}
-    //QFuture<void> future = QtConcurrent::run([&] {
-	while (query.next())
-	{
-        items.append(new QTreeWidgetItem(
-                         QStringList(query.value(0).toString())));
-        //);
-    }
-    //} });
-    std::cerr << "kész";
-    //setUpdatesEnabled(true);
-    //});
-    //list->addChildren(items);
-    //future.waitForFinished();
-    list->addChildren(items);
-    //QtConcurrent::run(list, &QTreeWidgetItem::addChildren, items);
-    //QFuture<void> futura = QtConcurrent::run(list, &QTreeWidgetItem::addChildren, items);
-    return true;
-}
+    setUpdatesEnabled(false);
 
-void MainWindow::executeSelection()
-{
+    QList<QTreeWidgetItem*> items;
+    QSqlQuery query = db.exec(queryToExecute);
+    query.setForwardOnly(true);
+    if (!query.isActive())
+    {
+        return false;
+    }
+
+    while (query.next())
+    {
+        const QString item = query.value(0).toString();
+        std::cerr << item.toStdString();
+        items.append(new QTreeWidgetItem({item}));
+    }
+
+    list->addChildren(items);
+
+    setUpdatesEnabled(true);
+
+    return true;
 }
 
 void MainWindow::registerShortcuts()
 {
-    QShortcut * shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), queries);
-    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(executeQuery()));
+    QShortcut * shortcut;
+    shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), queries);
+    QObject::connect(shortcut, SIGNAL(activated())
+                     , this, SLOT(executeQuery()));
 
     shortcut = new QShortcut(QKeySequence(Qt::Key_F4), queries);
-    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(showExecutionPlan()));
+    QObject::connect(shortcut, SIGNAL(activated())
+                     , this, SLOT(showExecutionPlan()));
 
     shortcut = new QShortcut(QKeySequence(Qt::Key_F3), queries);
-    QObject::connect(shortcut, &QShortcut::activated, this, &MainWindow::executeSelection);
+    QObject::connect(shortcut, &QShortcut::activated
+                     , this, &MainWindow::executeSelection);
 }
 
 void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int /*column*/)
@@ -128,46 +130,81 @@ void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int /*colum
 
 void MainWindow::showExecutionPlan()
 {
-    std::function<bool(QString&)> toExecute = [&] (QString& failMessage) {
-		QSqlQuery * q = new QSqlQuery(db);
-		QString query = queries->extractQuery();
-		QString explainPlan = QString("EXPLAIN PLAN SET STATEMENT_ID = 'temp1' FOR %1").arg(query);
-		bool success = q->exec(explainPlan);
-		if (success)
-		{
-            /*success = q->exec("SELECT cardinality \"Rows\", \
-				lpad(' ',level-1)||operation||' '||options||' '||object_name \"Plan\" \
-				FROM PLAN_TABLE \
-				CONNECT BY prior id = parent_id \
-				AND prior statement_id = statement_id \
-				START WITH id = 0 \
-				AND statement_id = 'temp1' \
-                ORDER BY id");*/
-             success =     q->exec("SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())");
-			if (success)
-			{
-				QSqlQueryModel* model = new QSqlQueryModel;
-				model->setQuery(*q);
-				QTableView *view = new QTableView(ui->tWLower);
-				view->setModel(model);
+    std::function<bool(QString&)> toExecute = [&] (QString& failMessage){
+        QSqlQuery * q = new QSqlQuery(db);
+        QString query = queries->extractQuery();
+        QString explainPlan = QString(
+                    "EXPLAIN PLAN SET STATEMENT_ID = 'temp1' FOR %1"
+                    ).arg(query);
+        bool success = q->exec(explainPlan);
+        if (success)
+        {
+            success = q->exec("SELECT cardinality, \
+                lpad(' ',level-1)||operation||' '||options||' '||object_name, \
+                depth, io_cost, cpu_cost, parent_id, id \
+                FROM PLAN_TABLE \
+                CONNECT BY prior id = parent_id \
+                AND prior statement_id = statement_id \
+                START WITH id = 0 \
+                AND statement_id = 'temp1' \
+                ORDER BY depth");
+
+            if (success)
+            {
+                QVector<QTreeWidgetItem*> plans;
+
+                while (q->next())
+                {
+                    const QString row = q->value(0).toString();
+                    const QString plan = q->value(1).toString().trimmed();
+                    const QString ioCost = q->value(3).toString();
+                    const QString cpuCost = q->value(4).toString();
+                    const int parent_id = q->value(5).isNull() ?
+                        -1 : q->value(5).toInt();
+                    QTreeWidgetItem* temp = new QTreeWidgetItem(
+                        QStringList({ plan, row, ioCost, cpuCost })
+                        );
+                    plans.append(temp);
+                    if (parent_id >= 0 && parent_id < plans.size())
+                    {
+                        plans.at(parent_id)->addChild(temp);
+                    }
+                }
+
+                /*QSqlQueryModel* model = new QSqlQueryModel;
+                model->setQuery(*q);
+                QTableView *view = new QTableView(ui->tWLower);
+                view->setModel(model);
                 view->horizontalHeader()->setStretchLastSection(true);
-				view->show();
-				ui->tWLower->addTab(view, "Lekérdezési terv");
-				ui->tWLower->setCurrentWidget(view);
-				success = q->exec("DELETE FROM PLAN_TABLE WHERE statement_id = 'temp1'");
-			}
-		}
+                view->show();
+                ui->tWLower->addTab(view, "Lekérdezési terv");
+                ui->tWLower->setCurrentWidget(view);*/
+
+                QTreeWidget* tree = new QTreeWidget();
+                tree->setColumnCount(4);
+                tree->setHeaderLabels({ "Lekérdezési terv", "Sorok"
+                            , "IO költség", "CPU költség" });
+                QList<QTreeWidgetItem*> temp = plans.toList();
+                tree->addTopLevelItem(temp.front());
+                ui->tWLower->addTab(tree, "Lekérdezési terv");
+                ui->tWLower->setCurrentWidget(tree);
+                success = q->exec("DELETE FROM PLAN_TABLE WHERE statement_id = 'temp1'");
+            }
+        }
         failMessage = q->lastError().text();
-		return success;
+        return success;
     };
-    logger.logWithTime("Lekérdezési terv sikeresen elkészült!", "Lekérdezési terv létrehozása sikertelen.", toExecute);
+
+    logger.logWithTime("Lekérdezési terv sikeresen elkészült!"
+                       , "Lekérdezési terv létrehozása sikertelen."
+                       , toExecute);
 }
 
-/*void MainWindow::executeSelection()
+void MainWindow::executeSelection()
 {
     QString query = queries->textCursor().selectedText();
     executeString(query);
-}*/
+}
 
 void MainWindow::executeString(const QString& query)
 {
@@ -185,7 +222,9 @@ void MainWindow::executeString(const QString& query)
     }
 	if ("SELECT" == words.at(0))
     {
-        bool success = logger.logWithTime("Lekérdezés sikeresen végrehajtva!", "Lekérdezés sikertelen.", toExecute);
+        bool success = logger.logWithTime("Lekérdezés sikeresen végrehajtva!"
+                                          , "Lekérdezés sikertelen."
+                                          , toExecute);
         if (success)
         {
             QSqlQueryModel* model = new QSqlQueryModel;
@@ -377,11 +416,11 @@ void MainWindow::on_actionMent_s_triggered()
 void MainWindow::on_action_jrakapcsol_d_s_triggered()
 {
     QDialog dialog(this);
-    // Use a layout allowing to have a label next to each field
     QFormLayout form(&dialog);
 
-    // Add some text above the fields
-    form.addRow(new QLabel(tr("Kérem adja meg újra a felhasználónevét és jelszavát!")));
+    form.addRow(new QLabel(
+                    tr("Kérem adja meg újra a felhasználónevét és jelszavát!")
+                ));
 
     QLineEdit* userName = new QLineEdit(&dialog);
     form.addRow(tr("Felhasználónév: "), userName);
@@ -403,6 +442,7 @@ void MainWindow::on_action_jrakapcsol_d_s_triggered()
     if (dialog.exec() == QDialog::Accepted)
     {
         db.close();
-        //db.open(userName->text(), password->text());
+        db.open(userName->text(), password->text());
+        password->setText("");
     }
 }

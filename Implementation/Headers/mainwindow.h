@@ -38,6 +38,8 @@
 #include "dblogger.hpp"
 #include "sqleditor.h"
 
+#include <iostream>
+
 namespace Ui
 {
     class MainWindow;
@@ -82,6 +84,18 @@ private slots:
     {
         QString query = queries->extractQuery();
         executeString(query);
+        QSqlQuery q;
+        q.exec("SET SERVEROUTPUT ON");
+        std::cerr << q.lastError().databaseText().toStdString();
+        q.exec("DBMS_OUTPUT.GET_LINES()");
+        if (q.isActive())
+        {
+            while (q.next())
+            {
+                logger.log(q.value(0).toString());
+            }
+        }
+        std::cerr << q.lastError().databaseText().toStdString();
     }
 
     void on_action_jrakapcsol_d_s_triggered();

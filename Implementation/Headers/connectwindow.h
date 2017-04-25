@@ -5,10 +5,8 @@
 #include "Headers/mainwindow.h"
 
 #include <QMainWindow>
-#include <QListWidgetItem>
 #include <QShortcut>
 
-#include <fstream>
 #include <QXmlStreamWriter>
 #include <QDir>
 
@@ -21,27 +19,29 @@
 
 namespace Ui
 {
-	class ConnectWindow;
+    class ConnectWindow;
 }
 
 class ConnectWindow : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit ConnectWindow(QWidget* parent = nullptr);
-	~ConnectWindow();
+    ~ConnectWindow();
 
     void fillConnectionList() noexcept;
 
+    QString buildConnectionName(const QString& fname) const noexcept;
+
 private slots:
-	void on_pbConnect_clicked();
-	void on_lwConnections_itemDoubleClicked(QListWidgetItem* item);
-	void on_pbSave_clicked();
-	void deleteConnection();
+    void on_pbConnect_clicked();
+    void on_lwConnections_itemDoubleClicked(QListWidgetItem* item);
+    void on_pbSave_clicked();
+    void deleteConnection() noexcept;
 
 private:
-	Ui::ConnectWindow* ui;
+    Ui::ConnectWindow* ui;
 };
 
 #endif // CONNECTWINDOW_H

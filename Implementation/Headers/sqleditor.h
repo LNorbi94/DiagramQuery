@@ -22,6 +22,8 @@
 
 #include <iostream>
 
+#include "constants.h"
+
 class SqlEditor : public QTextEdit
 {
     Q_OBJECT
@@ -31,6 +33,8 @@ public:
     {
         connect(this, &SqlEditor::cursorPositionChanged
                 , this, &SqlEditor::highlightCurrentLine);
+
+        setAcceptRichText(false);
     }
 
     QString extractQuery() noexcept;

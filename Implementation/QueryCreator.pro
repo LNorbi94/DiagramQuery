@@ -8,7 +8,7 @@ QT  += core gui
 QT  += sql
 QT	+= charts
 
-QMAKE_CXXFLAGS += -Wextra -fomit-frame-pointer -std=c++11 -pedantic -Wpadded
+QMAKE_CXXFLAGS += -Wextra -fomit-frame-pointer -std=c++11 -pedantic
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
