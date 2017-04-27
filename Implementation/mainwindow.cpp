@@ -9,6 +9,8 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     , db(database)
 {
     ui->setupUi(this);
+    upperTabIndex = 0;
+    lowerTabIndex = 0;
 
     progressBar = new QProgressBar(ui->statusBar);
     progressBar->setRange(0, 100);
@@ -25,7 +27,7 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     highLighter->setDocument(queries->document());
     QString dbName = db.hostName();
     ui->tWUpper->addTab(queries, dbName);
-    queries->load("/home/lestarn/Documents/QueryCreator/Tests/Test02.sql");
+    queries->load("/home/lestarn/Documents/QueryCreator/Tests/Test01.sql");
 
     QTreeWidget * treeWidget = ui->trWLeft;
     treeWidget->setColumnCount(1);
@@ -42,6 +44,7 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     items.append(indexes);
     items.append(views);
     items.append(functions);
+
     treeWidget->insertTopLevelItems(0, items);
     treeWidget->setHeaderLabel(dbName);
     ui->statusBar->addPermanentWidget(progressBar, 0);
@@ -62,8 +65,10 @@ bool MainWindow::fillList(QTreeWidgetItem* list
     setUpdatesEnabled(false);
 
     QList<QTreeWidgetItem*> items;
-    QSqlQuery query = db.exec(queryToExecute);
+    QSqlQuery query;
     query.setForwardOnly(true);
+    query.exec(queryToExecute);
+
     if (!query.isActive())
     {
         return false;
@@ -72,10 +77,8 @@ bool MainWindow::fillList(QTreeWidgetItem* list
     while (query.next())
     {
         const QString item = query.value(0).toString();
-        std::cerr << item.toStdString();
         items.append(new QTreeWidgetItem({item}));
     }
-
     list->addChildren(items);
 
     setUpdatesEnabled(true);
@@ -85,7 +88,7 @@ bool MainWindow::fillList(QTreeWidgetItem* list
 
 void MainWindow::registerShortcuts()
 {
-    QShortcut * shortcut;
+    QShortcut* shortcut;
     shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), queries);
     QObject::connect(shortcut, SIGNAL(activated())
                      , this, SLOT(executeQuery()));
@@ -97,35 +100,72 @@ void MainWindow::registerShortcuts()
     shortcut = new QShortcut(QKeySequence(Qt::Key_F3), queries);
     QObject::connect(shortcut, &QShortcut::activated
                      , this, &MainWindow::executeSelection);
+
+    QObject::connect(ui->tWUpper, &QTabWidget::currentChanged
+                     , [&] (int index) { upperTabIndex = index; });
+    QObject::connect(ui->tWLower, &QTabWidget::currentChanged
+                     , [&] (int index) { lowerTabIndex = index; });
+
+    shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W)
+                             , this);
+    QObject::connect(shortcut, &QShortcut::activated, [&]
+    {
+        if (upperTabIndex != 0)
+            on_tWUpper_tabCloseRequested(upperTabIndex);
+    });
+
+    shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W)
+                             , this);
+    QObject::connect(shortcut, &QShortcut::activated, [&]
+    {
+        if (lowerTabIndex != 0)
+            on_tWLower_tabCloseRequested(lowerTabIndex);
+    });
 }
 
-void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item, int /*column*/)
+void MainWindow::on_trWLeft_itemDoubleClicked(QTreeWidgetItem* item
+                                              , int /*column*/)
 {
     qDeleteAll(item->takeChildren());
-    std::function<bool(QString&)> toExecute;
-	if (queries::TABLES == item->text(0))
-	{
-        toExecute = [&] (QString& /*failMessage*/) { return fillTableList(item); };
-	}
-	else if (queries::INDEXES == item->text(0))
-	{
-        toExecute = [&] (QString& /*failMessage*/) { return fillIndexList(item); };
-	}
-	else if (queries::VIEWS == item->text(0))
+    bool earlyReturn = false;
+    bool ret = false;
+
+    if (queries::TABLES == item->text(0))
     {
-        toExecute = [&] (QString& /*failMessage*/) { return fillViewList(item); };
-	}
-	else if (queries::FUNCTIONS == item->text(0))
-	{
-        toExecute = [&] (QString& /*failMessage*/) { return fillFunctionList(item); };
-	}
+        ret = fillTableList(item);
+    }
+    else if (queries::INDEXES == item->text(0))
+    {
+        ret = fillIndexList(item);
+    }
+    else if (queries::VIEWS == item->text(0))
+    {
+        ret = fillViewList(item);
+    }
+    else if (queries::FUNCTIONS == item->text(0))
+    {
+        ret = fillFunctionList(item);
+    }
     else
     {
-        on_actionMegtekint_s_triggered();
-        return;
+        earlyReturn = true;
     }
-    logger.logWithTime("Adatbázisban található objektumok sikeresen lekérdezve."
-                       , "Hiba történt a lekérdezés végrehajtása közben!", toExecute);
+
+    std::function<bool(QString&)> toExecute = [&] (QString& /*failMessage*/)
+    {
+        return ret;
+    };
+
+    if (earlyReturn)
+    {
+        on_actionMegtekint_s_triggered();
+    }
+    else
+    {
+        logger.logWithTime("Adatbázisban található objektumok sikeresen lekérdezve."
+                           , "Hiba történt a lekérdezés végrehajtása közben!"
+                           , toExecute);
+    }
 }
 
 void MainWindow::showExecutionPlan()
@@ -171,21 +211,21 @@ void MainWindow::showExecutionPlan()
                     }
                 }
 
-                /*QSqlQueryModel* model = new QSqlQueryModel;
-                model->setQuery(*q);
-                QTableView *view = new QTableView(ui->tWLower);
-                view->setModel(model);
-                view->horizontalHeader()->setStretchLastSection(true);
-                view->show();
-                ui->tWLower->addTab(view, "Lekérdezési terv");
-                ui->tWLower->setCurrentWidget(view);*/
-
                 QTreeWidget* tree = new QTreeWidget();
                 tree->setColumnCount(4);
                 tree->setHeaderLabels({ "Lekérdezési terv", "Sorok"
                             , "IO költség", "CPU költség" });
                 QList<QTreeWidgetItem*> temp = plans.toList();
                 tree->addTopLevelItem(temp.front());
+
+                const int colCount = tree->columnCount() - 1;
+                const int width = ui->tWUpper->width() - 20 - 500;
+                tree->setColumnWidth(0, 500);
+                for (int i = 1; i < colCount; ++i)
+                {
+                    tree->setColumnWidth(i, width / colCount);
+                }
+
                 ui->tWLower->addTab(tree, "Lekérdezési terv");
                 ui->tWLower->setCurrentWidget(tree);
                 success = q->exec("DELETE FROM PLAN_TABLE WHERE statement_id = 'temp1'");
@@ -220,7 +260,7 @@ void MainWindow::executeString(const QString& query)
     {
         i = i.toUpper();
     }
-	if ("SELECT" == words.at(0))
+    if (words.size() >= 1 && "SELECT" == words.at(0))
     {
         bool success = logger.logWithTime("Lekérdezés sikeresen végrehajtva!"
                                           , "Lekérdezés sikertelen."
@@ -236,9 +276,9 @@ void MainWindow::executeString(const QString& query)
             ui->tWLower->setCurrentWidget(view);
         }
     }
-	else if ("MAKE" == words.at(0))
+    else if (words.size() >= 2 && "MAKE" == words.at(0))
     {
-		if ("CHART" == words.at(1))
+        if ("CHART" == words.at(1))
         {
             QString message;
             QT_CHARTS_USE_NAMESPACE
@@ -248,11 +288,11 @@ void MainWindow::executeString(const QString& query)
             {
                 success = queries->makeChart(msg
                                    , chart
-				                   , &words
+                                   , &words
                                    , query
                                    , q);
                 message = msg;
-				delete q;
+                delete q;
                 return success;
             };
 
@@ -311,8 +351,8 @@ void MainWindow::on_actionT_rl_s_triggered()
         logger.logWithTime("Adatbázisban található objektum sikeresen törölve."
                            , "Hiba történt a törlés végrehajtása közben!"
                            , toExecute);
-		delete child;
-	}
+        delete child;
+    }
 }
 
 void MainWindow::on_actionMegtekint_s_triggered()
@@ -385,21 +425,21 @@ void MainWindow::on_actionMegtekint_s_triggered()
 
 MainWindow::~MainWindow()
 {
-	delete ui;
-	delete progressBar;
-	delete queries;
+    delete ui;
+    delete progressBar;
+    delete queries;
     delete &db;
-	delete &logger;
+    delete &logger;
 }
 
 void MainWindow::on_tWUpper_tabCloseRequested(int index)
 {
-	delete ui->tWUpper->widget(index);
+    delete ui->tWUpper->widget(index);
 }
 
 void MainWindow::on_tWLower_tabCloseRequested(int index)
 {
-	delete ui->tWLower->widget(index);
+    delete ui->tWLower->widget(index);
 }
 
 

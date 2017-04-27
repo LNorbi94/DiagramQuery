@@ -1,7 +1,9 @@
 ﻿#ifndef DBLOGGER_HPP
 #define DBLOGGER_HPP
 
-#include <QObject>
+#include <QTextStream>
+#include <QDir>
+
 #include <QPlainTextEdit>
 #include <QProgressBar>
 
@@ -10,35 +12,59 @@
 
 #include <functional>
 
+#include "constants.h"
+
 class DBLogger : public QPlainTextEdit
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
     DBLogger(QWidget* parent = nullptr, QProgressBar* pB = nullptr)
         : QPlainTextEdit(parent), progressBar(pB)
-	{
-		QPlainTextEdit::setReadOnly(true);
-	}
+    {
+        QPlainTextEdit::setReadOnly(true);
+        if (Q_UNLIKELY(!QDir(logger::LOG_FOLDER).exists()))
+        {
+            QDir().mkdir(logger::LOG_FOLDER);
+        }
+        QString fname = logger::LOG_FOLDER;
+        fname.append(QDir::separator());
+        fname.append(QDate::currentDate().toString("yyyy_MM_dd"));
+        fname.append(".log");
+        logFile.setFileName(fname);
+        logFile.open(QIODevice::WriteOnly | QIODevice::Append);
+        logFileStream.setDevice(&logFile);
+    }
 
-	void appendPlainText(const QString& text)
-	{
-        QPlainTextEdit::appendPlainText(
-                    QString("[%1] %2")
-                    .arg(QTime::currentTime().toString())
-                    .arg(text));
-	}
+    /*
+     * Only for the show for now, it doesn't actually show progress.
+     *
+     */
+    void setProgressBar(QProgressBar* pB) noexcept
+    {
+        progressBar = pB;
+    }
+
+    void appendPlainText(const QString& text) noexcept
+    {
+        const QString message = QString("[%1] %2")
+                .arg(QTime::currentTime().toString())
+                .arg(text);
+
+        QPlainTextEdit::appendPlainText(message);
+        logFileStream << message << "\r\n";
+        logFileStream.flush();
+    }
+
     bool logWithTime(const QString& success
                      , const QString& fail
                      , std::function<bool(QString&)>& slowFunc);
-    void log(const QString text, const QString errorMessage = "");
-	void setProgressBar(QProgressBar* pB)
-	{
-		progressBar = pB;
-	}
+    void log(const QString& text, const QString& errorMessage = "");
 
 private:
-	QProgressBar* progressBar;
+    QProgressBar* progressBar;
+    QFile logFile;
+    QTextStream logFileStream;
 };
 
 #endif

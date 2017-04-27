@@ -18,11 +18,6 @@ ConnectWindow::~ConnectWindow()
     delete ui;
 }
 
-/*
- * This function is used in saving and deleting config files.
- * It's handy in case something new is added.
- *
- */
 QString ConnectWindow::buildConnectionName(const QString& fname) const noexcept
 {
     QString filename = connections::CONFIGFOLDER;
@@ -32,11 +27,6 @@ QString ConnectWindow::buildConnectionName(const QString& fname) const noexcept
     return filename;
 }
 
-/*
- * Deletes a connection from default config folder, and from the ListWidget
- * as well. It should work properly on any platform where Qt compiles.
- *
- */
 void ConnectWindow::deleteConnection() noexcept
 {
     QListWidgetItem* itemToDelete = ui->lwConnections->currentItem();
@@ -49,12 +39,6 @@ void ConnectWindow::deleteConnection() noexcept
     }
 }
 
-/*
- *  Fills ListWidget with connections (with xml extension)
- *  from default config folder.
- *  It also clears the ListWidget before inserting.
- *
- */
 void ConnectWindow::fillConnectionList() noexcept
 {
     ui->lwConnections->clear();
@@ -77,7 +61,7 @@ void ConnectWindow::fillConnectionList() noexcept
 }
 
 /*
- * Reads tags from config file. Possible improvements: reduce ifs.
+ * Possible improvements: reduce ifs.
  *
  */
 void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem* item)
@@ -121,12 +105,6 @@ void ConnectWindow::on_lwConnections_itemDoubleClicked(QListWidgetItem* item)
     }
 }
 
-/*
- * It saves the input data into a file under config folder.
- * A connection can't be saved if: the name is empty, or a connection file
- * exists with the same name already.
- *
- */
 void ConnectWindow::on_pbSave_clicked()
 {
     QInputDialog input;
@@ -138,64 +116,57 @@ void ConnectWindow::on_pbSave_clicked()
                 "Kérem írja be milyen néven kívánja menteni a kapcsolatot!");
     input.setBaseSize(QSize(200, 100));
 
-    if (input.exec())
+    if (!input.exec())
+        return;
+    if (Q_UNLIKELY(!QDir(connections::CONFIGFOLDER).exists()))
     {
-        if (Q_UNLIKELY(!QDir(connections::CONFIGFOLDER).exists()))
-        {
-            bool dirCreated = QDir().mkdir(connections::CONFIGFOLDER);
-            if (!dirCreated)
-            {
-                QMessageBox::warning(
-                    this
-                    , tr("Könyvtár létrehozása sikertelen!")
-                    , errors::DIR_NOT_CREATED);
-                return;
-            }
-        }
-        QString filename = connections::CONFIGFOLDER;
-        QString connectionName = input.textValue();
-        if (Q_UNLIKELY(connectionName.isEmpty()))
+        const bool dirCreated = QDir().mkdir(connections::CONFIGFOLDER);
+        if (!dirCreated)
         {
             QMessageBox::warning(
                 this
-                , tr("Név megadása kötelező")
-                , errors::EMPTY_NAME);
+                , tr("Könyvtár létrehozása sikertelen!")
+                , errors::DIR_NOT_CREATED);
             return;
         }
-        filename.append(QDir::separator());
-        filename.append(connectionName);
-        filename.append(".xml");
-        QFile file(filename);
-        if (Q_UNLIKELY(file.exists()))
-        {
-            QMessageBox::warning(
-                this
-                , tr("Létező név")
-                , errors::ALREADY_EXISTS);
-            return;
-        }
-        file.open(QIODevice::WriteOnly);
-        QXmlStreamWriter stream(&file);
-        stream.setAutoFormatting(true);
-        stream.writeStartDocument();
-        stream.writeStartElement("Connection");
-        stream.writeAttribute("name", connectionName);
-        stream.writeTextElement("host", ui->lEHost->text());
-        stream.writeTextElement("port", ui->lEPort->text());
-        stream.writeTextElement("service", ui->lEService->text());
-        stream.writeTextElement("username", ui->lEUsername->text());
-        stream.writeEndElement();
-        stream.writeEndDocument();
-        fillConnectionList();
     }
+    QString filename = connections::CONFIGFOLDER;
+    QString connectionName = input.textValue();
+    if (Q_UNLIKELY(connectionName.isEmpty()))
+    {
+        QMessageBox::warning(
+            this
+            , tr("Név megadása kötelező")
+            , errors::EMPTY_NAME);
+        return;
+    }
+    filename.append(QDir::separator());
+    filename.append(connectionName);
+    filename.append(".xml");
+    QFile file(filename);
+    if (Q_UNLIKELY(file.exists()))
+    {
+        QMessageBox::warning(
+            this
+            , tr("Létező név")
+            , errors::ALREADY_EXISTS);
+        return;
+    }
+    file.open(QIODevice::WriteOnly);
+    QXmlStreamWriter stream(&file);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+    stream.writeStartElement("Connection");
+    stream.writeAttribute("name", connectionName);
+    stream.writeTextElement("host", ui->lEHost->text());
+    stream.writeTextElement("port", ui->lEPort->text());
+    stream.writeTextElement("service", ui->lEService->text());
+    stream.writeTextElement("username", ui->lEUsername->text());
+    stream.writeEndElement();
+    stream.writeEndDocument();
+    fillConnectionList();
 }
 
-/*
- * Connects to the database, and destroys this windows.
- * It uses database's open function, in order for password to be in memory for
- * the least amount of time.
- *
- */
 void ConnectWindow::on_pbConnect_clicked()
 {
     QSqlDatabase* db = new QSqlDatabase(QSqlDatabase::addDatabase("QOCI"));

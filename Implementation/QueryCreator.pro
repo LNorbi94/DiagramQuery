@@ -6,7 +6,7 @@
 
 QT  += core gui
 QT  += sql
-QT	+= charts
+QT  += charts
 
 QMAKE_CXXFLAGS += -Wextra -fomit-frame-pointer -std=c++11 -pedantic
 
@@ -39,3 +39,6 @@ else:unix: LIBS += -L$$PWD/../Build/ -lqsqloci
 
 INCLUDEPATH += $$PWD/../Build
 DEPENDPATH += $$PWD/../Build
+
+RESOURCES += \
+    resources.qrc

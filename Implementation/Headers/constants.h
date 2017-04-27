@@ -62,4 +62,9 @@ namespace errors
     "Kérem ellenőrizze jogosultságát a program könyvtárához.");
 }
 
+namespace logger
+{
+    const QString LOG_FOLDER = "Logs";
+}
+
 #endif // !CONSTANTS_H

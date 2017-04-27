@@ -7,8 +7,9 @@ bool DBLogger::logWithTime(const QString & success, const QString& fail
     qint64 elapsedTime = 0;
     progressBar->setValue(100);
     progressBar->setRange(0, 0);
-    timer.start();
     QString errorMessage;
+    timer.start();
+
     bool ret = false;
     if ((ret = slowFunc(errorMessage)))
     {
@@ -19,15 +20,15 @@ bool DBLogger::logWithTime(const QString & success, const QString& fail
     }
     else
     {
-        appendPlainText(fail);
-        appendPlainText(errorMessage);
+        log(fail, errorMessage);
     }
+
     progressBar->setRange(0, 100);
     progressBar->setValue(0);
     return ret;
 }
 
-void DBLogger::log(const QString text, const QString errorMessage)
+void DBLogger::log(const QString& text, const QString& errorMessage)
 {
     appendPlainText(text);
     if (!errorMessage.isEmpty())

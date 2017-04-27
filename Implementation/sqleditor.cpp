@@ -2,43 +2,32 @@
 
 QString SqlEditor::extractQuery() noexcept
 {
-	QTextCursor cursor(textCursor());
-
-    // plsql block: declare, begin, create
-    // comments
+    QTextCursor cursor(textCursor());
 
     bool plSql = false;
     bool atEnd;
 
-    QStringList plsqlWords;
-
-    plsqlWords << ("DECLARE");
-    plsqlWords << ("BEGIN");
-    plsqlWords << ("CREATE");
-    plsqlWords << ("CASE");
-    plsqlWords << ("FOR");
-
     bool exit = false;
 
     cursor.movePosition(QTextCursor::PreviousCharacter
-                                  , QTextCursor::KeepAnchor);
-    cursor.movePosition(QTextCursor::PreviousCharacter
-                                  , QTextCursor::KeepAnchor);
+                                  , QTextCursor::KeepAnchor, 2);
 
-    QString text = cursor.selectedText().toUpper();
+    QString text = cursor.selectedText();
 
     atEnd = plSql = text.contains('/');
 
-    while(cursor.movePosition(QTextCursor::PreviousWord
-                              , QTextCursor::KeepAnchor) && !exit)
+    while(!exit && cursor.movePosition(QTextCursor::PreviousWord
+                              , QTextCursor::KeepAnchor))
     {
-        text = cursor.selectedText().toUpper();
-        exit = text.contains("/") || text.contains(tokens::EMPTY_LINE);
+        text = cursor.selectedText();
+        exit = text.contains('/') || text.contains(tokens::EMPTY_LINE);
     }
+
+    QString query;
 
     if (!plSql)
     {
-        QTextCursor cursor(textCursor());
+        cursor.setPosition(textCursor().position());
         cursor.beginEditBlock();
         cursor.clearSelection();
         cursor.movePosition(QTextCursor::PreviousWord);
@@ -54,13 +43,8 @@ QString SqlEditor::extractQuery() noexcept
                && cursor.movePosition(QTextCursor::NextWord
                                       , QTextCursor::KeepAnchor));
         cursor.endEditBlock();
-
-        QString query = cursor.selectedText();
-        query = query.remove(QRegExp("--([^\\s]| )*"));
-        query = query.remove(';').remove('/').simplified();
-        setTextCursor(cursor);
-        return query;
-    } else
+    }
+    else
     {
         if (!atEnd)
             cursor.clearSelection();
@@ -71,32 +55,34 @@ QString SqlEditor::extractQuery() noexcept
                 : QTextCursor::NextWord;
         while(!exit && cursor.movePosition(where, QTextCursor::KeepAnchor))
         {
-            const QString selectedText = cursor.selectedText().toUpper();
+            const QString selectedText = cursor.selectedText();
             exit = selectedText.contains('/');
             if (atEnd)
                 exit = selectedText.contains(tokens::EMPTY_LINE);
         }
-
-        setTextCursor(cursor);
-        QString query = cursor.selectedText();
-        query = query.remove(QRegExp("--[^\u2029]*"));
-        query = query.remove(QRegExp("/\\*([^/]|[^*]/)*\\*/"));
-        query = query.remove('/');
-        std::cerr << query.simplified().toStdString() << std::endl;
-        return query.simplified();
     }
+    setTextCursor(cursor);
+    query = cursor.selectedText();
+    query = query.remove(QRegExp("--[^\u2029]*"));
+    query = query.remove(QRegExp("/\\*([^/]|[^*]/)*\\*/"));
+    query = query.remove('/');
+
+    if (!plSql)
+        query = query.remove(';');
+
+    return query.simplified();
 }
 
 void SqlEditor::save() const
 {
-	const QString fName = QFileDialog::getSaveFileName(nullptr
-	                                                   , tr("Lap mentése")
-	                                                   , ""
-	                                             , tr("Sql fájl (*.sql)"));
-    if (!fName.isEmpty())
+    const QString fName = QFileDialog::getSaveFileName(nullptr
+                                                    , tr("Lap mentése")
+                                                    , ""
+                                                    , tr("Sql fájl (*.sql)"));
+    if (Q_LIKELY(!fName.isEmpty()))
     {
         QFile file(fName);
-        file.open(QFile::ReadWrite | QFile::Text);
+        file.open(QFile::WriteOnly | QFile::Text);
         QTextStream writeF(&file);
         writeF << toPlainText();
     }
@@ -105,11 +91,11 @@ void SqlEditor::save() const
 void SqlEditor::load(const QString &filename)
 {
     QString fName = filename;
-    if (fName.isEmpty())
+    if (Q_LIKELY(fName.isEmpty()))
         fName = QFileDialog::getOpenFileName(this);
-	QFile file(fName);
+    QFile file(fName);
     file.open(QFile::ReadOnly | QFile::Text);
-	QTextStream readF(&file);
+    QTextStream readF(&file);
     setText(readF.readAll());
 }
 
@@ -124,6 +110,7 @@ bool SqlEditor::makeChart(QString& message
     bool tooMany = false;
     bool notEnough = false;
     QString chart_type;
+
     auto groupedBy = std::find(queryInWords->begin()
                                , queryInWords->end(), "BY");
     const QRegExp regexp("\\((.)*");
@@ -175,9 +162,6 @@ bool SqlEditor::makeChart(QString& message
         }
 
         chart->addSeries(series);
-        executed = queryCount <= 10;
-
-        tooMany = !executed;
     } else if ("BARCHART" == chart_type && executed)
     {
         q->previous();
@@ -192,21 +176,21 @@ bool SqlEditor::makeChart(QString& message
         }
 
         chart->addSeries(series);
-        executed = queryCount <= 10;
-
-        tooMany = !executed;
     } else
     {
         executed = false;
     }
 
-    notEnough = queryCount == 0;
+    executed = queryCount <= 10;
+    tooMany = !executed;
 
+    notEnough = queryCount == 0;
     executed = !notEnough;
 
     if (executed)
     {
-        chart->setTitle("Diagram rendezve a(z) " + *groupedBy + " oszlop alapján.");
+        chart->setTitle(
+                    "Diagram rendezve a(z) " + *groupedBy + " oszlop alapján.");
         chart->layout()->setContentsMargins(0, 0, 0, 0);
         chart->setTheme(QChart::ChartThemeDark);
         chart->setAnimationOptions(QChart::AllAnimations);

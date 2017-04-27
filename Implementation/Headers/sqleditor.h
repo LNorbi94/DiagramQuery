@@ -1,7 +1,6 @@
 #ifndef SQLEDITOR_H
 #define SQLEDITOR_H
 
-#include <QObject>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QFileDialog>
@@ -19,8 +18,6 @@
 #include <QBarSet>
 #include <QPieSlice>
 #include <QGraphicsLayout>
-
-#include <iostream>
 
 #include "constants.h"
 
