@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QChart>
+#include <QTextBlock>
 
 #include <functional>
 

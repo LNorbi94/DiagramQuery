@@ -8,7 +8,7 @@ QT  += core gui
 QT  += sql
 QT  += charts
 
-QMAKE_CXXFLAGS += -Wextra -fomit-frame-pointer -std=c++11 -pedantic
+QMAKE_CXXFLAGS += -fomit-frame-pointer -std=c++11 -pedantic -weverything
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -33,8 +33,10 @@ HEADERS  += Headers/connectwindow.h \
 FORMS    += View/connectwindow.ui \
             View/mainwindow.ui
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/release/ -lqsqloci
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/debug/ -lqsqloci
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/release/
+-lqsqloci
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/debug/
+-lqsqloci
 else:unix: LIBS += -L$$PWD/../Build/ -lqsqloci
 
 INCLUDEPATH += $$PWD/../Build

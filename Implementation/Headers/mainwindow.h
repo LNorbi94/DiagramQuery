@@ -34,6 +34,7 @@
 #include "constants.h"
 #include "dblogger.hpp"
 #include "sqleditor.h"
+#include "connectwindow.h"
 
 namespace Ui
 {
@@ -76,6 +77,8 @@ private slots:
     }
 
     void on_action_jrakapcsol_d_s_triggered();
+
+    void on_action_j_kapcsolat_triggered();
 
 private:
     bool fillList(QTreeWidgetItem* list, const QString& queryToExecute) noexcept;

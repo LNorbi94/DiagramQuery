@@ -5,8 +5,8 @@ QString SqlEditor::extractQuery() noexcept
     QTextCursor cursor(textCursor());
 
     bool plSql = false;
-    bool atEnd;
-
+    bool atEnd = false;
+    bool atStart = false;
     bool exit = false;
 
     cursor.movePosition(QTextCursor::PreviousCharacter
@@ -15,55 +15,40 @@ QString SqlEditor::extractQuery() noexcept
     QString text = cursor.selectedText();
 
     atEnd = plSql = text.contains('/');
-
-    while(!exit && cursor.movePosition(QTextCursor::PreviousWord
+    while(!exit && cursor.movePosition(QTextCursor::Up
                               , QTextCursor::KeepAnchor))
     {
-        text = cursor.selectedText();
-        exit = text.contains('/') || text.contains(tokens::EMPTY_LINE);
+        text = cursor.block().text();
+        exit = text == ("/") || text.isEmpty();
     }
 
     QString query;
 
-    if (!plSql)
+    atStart = !cursor.movePosition(QTextCursor::Up);
+    exit = atEnd;
+    if (!exit)
     {
-        cursor.setPosition(textCursor().position());
-        cursor.beginEditBlock();
+        cursor.movePosition(QTextCursor::NextBlock, QTextCursor::KeepAnchor);
         cursor.clearSelection();
-        cursor.movePosition(QTextCursor::PreviousWord);
-        while (!cursor.selectedText().contains(";")
-               && cursor.movePosition(QTextCursor::PreviousWord
-                                      , QTextCursor::KeepAnchor));
-        if (!cursor.atStart())
-        {
-            cursor.movePosition(QTextCursor::NextWord, QTextCursor::KeepAnchor);
-        }
-        cursor.clearSelection();
-        while (!cursor.selectedText().contains(";")
-               && cursor.movePosition(QTextCursor::NextWord
-                                      , QTextCursor::KeepAnchor));
-        cursor.endEditBlock();
     }
-    else
-    {
-        if (!atEnd)
-            cursor.clearSelection();
-        exit = false;
 
-        const QTextCursor::MoveOperation where = atEnd
-                ? QTextCursor::PreviousWord
-                : QTextCursor::NextWord;
-        while(!exit && cursor.movePosition(where, QTextCursor::KeepAnchor))
-        {
-            const QString selectedText = cursor.selectedText();
-            exit = selectedText.contains('/');
-            if (atEnd)
-                exit = selectedText.contains(tokens::EMPTY_LINE);
-        }
+    while(!exit && cursor.movePosition(QTextCursor::Down
+                              , QTextCursor::KeepAnchor))
+    {
+        text = cursor.block().text();
+        exit = text == ("/") || text.isEmpty();
+        plSql = text == ("/");
     }
+
+    if (atStart)
+    {
+        while (cursor.movePosition(QTextCursor::PreviousWord
+                                   , QTextCursor::KeepAnchor));
+    }
+
     setTextCursor(cursor);
     query = cursor.selectedText();
-    query = query.remove(QRegExp("--[^\u2029]*"));
+    query = query.remove(QRegExp("--[^\xe2\x80\xa9]*"));
     query = query.remove(QRegExp("/\\*([^/]|[^*]/)*\\*/"));
     query = query.remove('/');
 

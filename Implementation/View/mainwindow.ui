@@ -20,8 +20,8 @@
    <string>QueryCreator</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="SP_TitleBarMenuButton">
-    <normaloff>.</normaloff>.</iconset>
+   <iconset resource="../resources.qrc">
+    <normaloff>:/images/favicon</normaloff>:/images/favicon</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -80,7 +80,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuF_jl">
@@ -151,6 +151,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
