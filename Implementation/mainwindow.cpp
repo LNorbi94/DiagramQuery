@@ -177,7 +177,7 @@ void MainWindow::showExecutionPlan()
         bool success = q->exec(explainPlan);
         if (!success)
         {
-            return;
+            return success;
         }
         success = q->exec("SELECT cardinality, \
             lpad(' ',level-1)||operation||' '||options||' '||object_name, \
