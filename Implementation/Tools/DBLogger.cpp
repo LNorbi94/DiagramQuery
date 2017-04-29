@@ -1,4 +1,4 @@
-#include "Headers/dblogger.hpp"
+#include "Tools/DBLogger.h"
 
 bool DBLogger::logWithTime(const QString & success, const QString& fail
                            , std::function<bool(QString&)>& slowFunc)

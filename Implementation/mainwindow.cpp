@@ -244,8 +244,36 @@ void MainWindow::showExecutionPlan()
 void MainWindow::executeSelection()
 {
     const QString query = queries->textCursor().selectedText().simplified();
+    db.exec("CREATE TABLE temp (line varchar2(100) )");
+    db.exec("BEGIN \
+              DBMS_OUTPUT.ENABLE (buffer_size => NULL); \
+          END;");
     if (!query.isEmpty())
         executeString(query);
+
+    db.exec("DECLARE \
+            v_status  INTEGER := 0; \
+            v_line    VARCHAR2(100); \
+            v_buff    VARCHAR2(1000); \
+          BEGIN \
+            WHILE v_status = 0 LOOP \
+              DBMS_OUTPUT.GET_LINE (v_line, v_status); \
+             IF v_status = 0 then \
+             INSERT INTO temp VALUES (v_line); \
+            END IF; \
+            END LOOP; \
+          COMMIT; \
+          END;");
+    QSqlQuery* q = new QSqlQuery();
+    q->exec("select * from temp");
+
+    QSqlQueryModel* model = new QSqlQueryModel;
+    model->setQuery(*q);
+    QTableView* view = new QTableView(ui->tWLower);
+    view->setModel(model);
+    view->show();
+    ui->tWLower->addTab(view, "Dbms Output");
+    ui->tWLower->setCurrentWidget(view);
 }
 
 void MainWindow::executeString(const QString& query)

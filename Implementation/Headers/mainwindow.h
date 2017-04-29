@@ -31,10 +31,10 @@
 #include <QGraphicsLayout>
 
 #include "sqlhighlighter.hpp"
-#include "constants.h"
-#include "dblogger.hpp"
+#include "Tools/Constants.h"
+#include "Tools/DBLogger.h"
 #include "sqleditor.h"
-#include "connectwindow.h"
+#include "View/ConnectWindow.h"
 
 namespace Ui
 {

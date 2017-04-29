@@ -8,7 +8,7 @@ QT  += core gui
 QT  += sql
 QT  += charts
 
-QMAKE_CXXFLAGS += -fomit-frame-pointer -std=c++11 -pedantic -weverything
+QMAKE_CXXFLAGS += -fomit-frame-pointer -std=c++11 -pedantic
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,21 +17,23 @@ TEMPLATE    = app
 
 
 SOURCES +=  main.cpp\
-            connectwindow.cpp \
             mainwindow.cpp \
-            dblogger.cpp \
             sqlhighlighter.cpp \
-            sqleditor.cpp
+            sqleditor.cpp \
+            Control/ConnectWindowsLogic.cpp \
+            Tools/DBLogger.cpp \
+            View/ConnectWindow.cpp
 
-HEADERS  += Headers/connectwindow.h \
+HEADERS  += \
             Headers/mainwindow.h \
-            Headers/constants.h \
-            Headers/dblogger.hpp \
             Headers/sqlhighlighter.hpp \
-            Headers/sqleditor.h
+            Headers/sqleditor.h \
+            Control/ConnectWindowsLogic.h \
+            Tools/DBLogger.h \
+            Tools/Constants.h \
+            View/ConnectWindow.h
 
-FORMS    += View/connectwindow.ui \
-            View/mainwindow.ui
+FORMS    += View/mainwindow.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/release/
 -lqsqloci

@@ -1,6 +1,8 @@
 #ifndef SQLEDITOR_H
 #define SQLEDITOR_H
 
+#include "Tools/Constants.h"
+
 #include <QTextEdit>
 #include <QTextStream>
 #include <QFileDialog>
@@ -19,8 +21,6 @@
 #include <QBarSet>
 #include <QPieSlice>
 #include <QGraphicsLayout>
-
-#include "constants.h"
 
 class SqlEditor : public QTextEdit
 {

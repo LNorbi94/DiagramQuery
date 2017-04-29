@@ -60,7 +60,7 @@ namespace errors
     );
 
     const QString ALREADY_EXISTS = QString::fromUtf8(
-    "Már létezik kapcsolat ilyen névvel! Kérem adjon meg más nevet.");
+    "Már létezik kapcsolat ilyen névvel!");
 
     const QString DIR_NOT_CREATED = QString::fromUtf8(
     "Kérem ellenőrizze jogosultságát a program könyvtárához.");

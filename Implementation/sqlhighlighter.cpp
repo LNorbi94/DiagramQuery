@@ -56,7 +56,8 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 					<< "\\bvalidate\\b"		<< "\\bvalues\\b"	<< "\\bvarchar\\b"
 					<< "\\bvarchar2\\b"		<< "\\bview\\b"		<< "\\bwhenever\\b"
 					<< "\\bwhere\\b"		<< "\\bwith\\b"     << "\\bjoin\\b"
-                    << "\\bnatural join\\b" << "\\breplace\\b";
+                    << "\\bnatural join\\b" << "\\breplace\\b" << "\\bdeclare\\b"
+                    << "\\bbegin\\b" << "\\bend\\b";
 	rule.format = _keywordForm;
 	for (auto& pattern : keywordPatterns)
 	{
