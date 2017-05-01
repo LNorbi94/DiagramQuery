@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/images">
-        <file alias="closed_arrow.png">Resources/closed.png</file>
         <file alias="favicon">Resources/favicon.png</file>
-        <file alias="open_arrow">Resources/open.png</file>
-        <file alias="closed_arrow.bmp">Resources/closed.bmp</file>
     </qresource>
 </RCC>

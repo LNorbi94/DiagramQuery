@@ -2,11 +2,15 @@
 #define CONSTANTS_H
 
 #include <QString>
-#include <QRegExp>
 
 namespace connections
 {
     const QString CONFIGFOLDER = "Connections";
+}
+
+namespace logger
+{
+    const QString LOG_FOLDER = "Logs";
 }
 
 namespace queries
@@ -24,7 +28,7 @@ namespace queries
     const QString GET_VIEWS = "SELECT object_name FROM user_objects \
     WHERE object_type = 'VIEW' AND object_name NOT LIKE '%$%'";
 
-    const QString FUNCTIONS = QString::fromUtf8("Függvények");
+    const QString FUNCTIONS("Függvények");
     const QString GET_FUNCTIONS = "SELECT object_name FROM user_objects \
     WHERE object_type = 'FUNCTION' AND object_name NOT LIKE '%$%'";
 
@@ -66,9 +70,13 @@ namespace errors
     "Kérem ellenőrizze jogosultságát a program könyvtárához.");
 }
 
-namespace logger
+namespace confirms
 {
-    const QString LOG_FOLDER = "Logs";
+    const QString NEW_PAGE =
+            "Biztos új lapot kíván nyitni? Minden eddigi változtatása elveszik!";
+
+    const QString NEW_CONNECTION =
+            "A jelenlegi kapcsolat be fog záródni! Biztos hogy folytatja?";
 }
 
 namespace tables
@@ -76,9 +84,5 @@ namespace tables
     const int SIDEBAR_SIZE = 37;
 }
 
-namespace explain_plan
-{
-
-}
 
 #endif // !CONSTANTS_H

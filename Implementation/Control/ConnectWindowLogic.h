@@ -4,27 +4,23 @@
 #include "Tools/Constants.h"
 
 #include <QString>
-#include <QListWidgetItem>
-#include <QLineEdit>
-
 #include <QDir>
 #include <QXmlStreamWriter>
 
-#include <QtDebug>
+#include <QListWidgetItem>
+#include <QLineEdit>
 
-class ConnectWindowsLogic
+class ConnectWindowLogic
 {
-
 public:
-    const QString buildConnectionName(const QString& fname) const noexcept;
-    void deleteConnection(QListWidgetItem* item) noexcept;
-    const QStringList createList() const noexcept;
+    QString buildConnectionName(const QString& fname) const noexcept;
+    void deleteConnection(QListWidgetItem* item);
+    const QStringList createList() const;
     void save (const QString& connectionName
                , const std::map<QString, QLineEdit*>& textFields
                , QFile& file) noexcept;
     void load (std::map<QString, QLineEdit*>& textFields
-               , const QString& connectionName) const noexcept;
-
+               , const QString& connectionName) const;
 };
 
 #endif // CONNECTWINDOWSLOGIC_H

@@ -9,6 +9,7 @@ QT  += sql
 QT  += charts
 
 QMAKE_CXXFLAGS += -fomit-frame-pointer -std=c++11 -pedantic
+win32:CONFIG(release, debug|release): QMAKE_CXXFLAGS += -O3
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,32 +18,32 @@ TEMPLATE    = app
 
 
 SOURCES +=  main.cpp\
-            mainwindow.cpp \
-            sqlhighlighter.cpp \
-            sqleditor.cpp \
-            Control/ConnectWindowsLogic.cpp \
+            Control/ConnectWindowLogic.cpp \
+            Control/MainWindowLogic.cpp \
+            SQL/ServerOutput.cpp \
+            SQL/SQLEditor.cpp \
+            SQL/SQLHighlighter.cpp \
             Tools/DBLogger.cpp \
-            View/ConnectWindow.cpp
+            Tools/GUITools.cpp \
+            View/ConnectWindow.cpp \
+            View/MainWindow.cpp
 
-HEADERS  += \
-            Headers/mainwindow.h \
-            Headers/sqlhighlighter.hpp \
-            Headers/sqleditor.h \
-            Control/ConnectWindowsLogic.h \
-            Tools/DBLogger.h \
+HEADERS  += Control/ConnectWindowLogic.h \
+            Control/MainWindowLogic.h \
+            SQL/ServerOutput.h \
+            SQL/SQLEditor.h \
+            SQL/SQLHighlighter.h \
             Tools/Constants.h \
-            View/ConnectWindow.h
+            Tools/DBLogger.h \
+            Tools/GUITools.h \
+            View/ConnectWindow.h \
+            View/MainWindow.h
 
-FORMS    += View/mainwindow.ui
+RESOURCES += resources.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/release/
--lqsqloci
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/debug/
--lqsqloci
+win32:CONFIG(release, debug|release):LIBS += -L$$PWD/../Build/release/ -lqsqloci
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/debug/ -lqsqloci
 else:unix: LIBS += -L$$PWD/../Build/ -lqsqloci
 
 INCLUDEPATH += $$PWD/../Build
 DEPENDPATH += $$PWD/../Build
-
-RESOURCES += \
-    resources.qrc

@@ -1,5 +1,5 @@
-﻿#ifndef SQLHIGHLIGHTER_HPP
-#define SQLHIGHLIGHTER_HPP
+﻿#ifndef SQLHIGHLIGHTER_H
+#define SQLHIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
 
@@ -28,4 +28,4 @@ private:
     QTextCharFormat _literalForm;
 };
 
-#endif // SQLHIGHLIGHTER_HPP
+#endif // SQLHIGHLIGHTER_H

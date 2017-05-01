@@ -1,7 +1,7 @@
-#include "Tools/DBLogger.h"
+#include "DBLogger.h"
 
 bool DBLogger::logWithTime(const QString & success, const QString& fail
-                           , std::function<bool(QString&)>& slowFunc)
+                           , std::function<bool (QString&)>& slowFunc)
 {
     QElapsedTimer timer;
     qint64 elapsedTime = 0;

@@ -1,20 +1,21 @@
 #ifndef CONNECTWINDOW_H
 #define CONNECTWINDOW_H
 
+#include "Control/ConnectWindowLogic.h"
 #include "Tools/Constants.h"
-#include "Headers/mainwindow.h"
-#include "Control/ConnectWindowsLogic.h"
-
-#include <QMainWindow>
-#include <QShortcut>
+#include "Tools/GUITools.h"
+#include "View/MainWindow.h"
 
 #include <QSqlDatabase>
 #include <QSqlError>
 
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QShortcut>
 
+#include <QApplication>
 #include <QDesktopWidget>
+#include <QMainWindow>
 #include <QLayout>
 
 class ConnectWindow : public QMainWindow
@@ -23,23 +24,23 @@ class ConnectWindow : public QMainWindow
 
 public:
     explicit ConnectWindow(QWidget* parent = nullptr);
-
     void fillConnectionList() noexcept;
 
 private slots:
-    void on_pbConnect_clicked();
-    void load(QListWidgetItem* item) noexcept;
+    void connectToDatabase();
+    void load(QListWidgetItem* item) noexcept
+    { logic.load(textFields, item->text()); }
     void save();
     void deleteConnection() noexcept;
 
 private:
-    void setupLabels(QGridLayout *layout);
-    void setupLineEdites(QGridLayout *layout);
-    void setupButtons(QGridLayout *layout);
+    void setupLabels(QGridLayout* layout);
+    void setupLineEdites(QGridLayout* layout);
+    void setupButtons(QGridLayout* layout);
 
     std::map<QString, QLineEdit*> textFields;
     QListWidget* connectionList;
-    ConnectWindowsLogic logic;
+    ConnectWindowLogic logic;
 };
 
 #endif // CONNECTWINDOW_H

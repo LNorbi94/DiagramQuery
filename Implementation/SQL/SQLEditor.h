@@ -9,18 +9,16 @@
 #include <QChart>
 #include <QTextBlock>
 
-#include <functional>
-
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
 
+#include <QGraphicsLayout>
 #include <QChartView>
 #include <QPieSeries>
+#include <QPieSlice>
 #include <QBarSeries>
 #include <QBarSet>
-#include <QPieSlice>
-#include <QGraphicsLayout>
 
 class SqlEditor : public QTextEdit
 {
@@ -33,6 +31,7 @@ public:
                 , this, &SqlEditor::highlightCurrentLine);
 
         setAcceptRichText(false);
+        setFont(QFont("Segoe UI", 11));
     }
 
     QString extractQuery() noexcept;
@@ -46,9 +45,10 @@ public:
                 , QString query
                 , QSqlQuery* q);
 
+    bool isPlSql(const QString& query);
+
 private slots:
     void highlightCurrentLine();
-
 };
 
 #endif // SQLEDITOR_H

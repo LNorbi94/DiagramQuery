@@ -1,49 +1,50 @@
-#include "Headers/sqleditor.h"
+#include "SQL/SQLEditor.h"
 
 QString SqlEditor::extractQuery() noexcept
 {
     QTextCursor cursor(textCursor());
-
-    bool plSql = false;
-    bool atEnd = false;
-    bool atStart = false;
+    QString query;
+    QString text;
     bool exit = false;
+    bool atStart = false;
 
-    cursor.movePosition(QTextCursor::PreviousCharacter
-                                  , QTextCursor::KeepAnchor, 2);
-
-    QString text = cursor.selectedText();
-
-    atEnd = plSql = text.contains('/');
     while(!exit && cursor.movePosition(QTextCursor::Up
                               , QTextCursor::KeepAnchor))
     {
         text = cursor.block().text();
-        exit = text == ("/") || text.isEmpty();
+        exit = text.isEmpty();
     }
 
-    QString query;
-
-    atStart = !cursor.movePosition(QTextCursor::Up);
-    exit = atEnd;
-    if (!exit)
+    atStart = !exit;
+    if (atStart)
     {
-        cursor.movePosition(QTextCursor::NextBlock, QTextCursor::KeepAnchor);
-        cursor.clearSelection();
+        while(cursor.movePosition(QTextCursor::PreviousCharacter
+                                      , QTextCursor::KeepAnchor));
     }
+
+    cursor.clearSelection();
+
+    if (!atStart)
+        cursor.movePosition(QTextCursor::NextCharacter);
+
+    exit = false;
 
     while(!exit && cursor.movePosition(QTextCursor::Down
                               , QTextCursor::KeepAnchor))
     {
         text = cursor.block().text();
-        exit = text == ("/") || text.isEmpty();
-        plSql = text == ("/");
+        exit = text.isEmpty();
     }
 
-    if (atStart)
+    if (!exit)
     {
-        while (cursor.movePosition(QTextCursor::PreviousWord
-                                   , QTextCursor::KeepAnchor));
+        while(cursor.movePosition(QTextCursor::NextCharacter
+                                  , QTextCursor::KeepAnchor));
+    }
+    else
+    {
+        cursor.movePosition(QTextCursor::PreviousCharacter
+                                          , QTextCursor::KeepAnchor);
     }
 
     setTextCursor(cursor);
@@ -51,11 +52,31 @@ QString SqlEditor::extractQuery() noexcept
     query = query.remove(QRegExp("--[^\xe2\x80\xa9]*"));
     query = query.remove(QRegExp("/\\*([^/]|[^*]/)*\\*/"));
     query = query.remove('/');
+    query = query.simplified();
 
-    if (!plSql)
+    if (!isPlSql(query))
+    {
         query = query.remove(';');
+    }
 
-    return query.simplified();
+    return query;
+}
+
+bool SqlEditor::isPlSql(const QString &query)
+{
+    bool itIsPlSql = false;
+
+    QStringList keywords;
+    keywords << "DECLARE" << "BEGIN" << "CREATE OR REPLACE PROCEDURE"
+             << "CREATE OR REPLACE FUNCTION" << "CREATE OR REPLACE PACKAGE"
+             << "CREATE OR REPLACE TRIGGER";
+
+    for (const QString& keyword : keywords)
+    {
+        itIsPlSql = itIsPlSql || query.startsWith(keyword, Qt::CaseInsensitive);
+    }
+
+    return itIsPlSql;
 }
 
 void SqlEditor::save() const
@@ -64,6 +85,7 @@ void SqlEditor::save() const
                                                     , tr("Lap mentése")
                                                     , ""
                                                     , tr("Sql fájl (*.sql)"));
+
     if (Q_LIKELY(!fName.isEmpty()))
     {
         QFile file(fName);
@@ -76,11 +98,14 @@ void SqlEditor::save() const
 void SqlEditor::load(const QString &filename)
 {
     QString fName = filename;
+
     if (Q_LIKELY(fName.isEmpty()))
         fName = QFileDialog::getOpenFileName(this);
+
     QFile file(fName);
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream readF(&file);
+    readF.setAutoDetectUnicode(true);
     setText(readF.readAll());
 }
 
@@ -128,7 +153,6 @@ bool SqlEditor::makeChart(QString& message
     else
     {
         ++groupedBy;
-        groupedBy->remove(')');
         executed = true;
     }
 
@@ -147,6 +171,7 @@ bool SqlEditor::makeChart(QString& message
         }
 
         chart->addSeries(series);
+        chart->legend()->setAlignment(Qt::AlignLeft);
     } else if ("BARCHART" == chart_type && executed)
     {
         q->previous();
@@ -154,40 +179,43 @@ bool SqlEditor::makeChart(QString& message
 
         while (q->next())
         {
-            QBarSet* temp = new QBarSet(q->value(0).toString());
+            QBarSet* temp = new QBarSet(QString("%1 (%2)")
+                                        .arg(q->value(0).toString())
+                                        .arg(q->value(1).toInt()));
             *temp << q->value(1).toInt();
             series->append(temp);
             ++queryCount;
         }
 
         chart->addSeries(series);
+        chart->legend()->setAlignment(Qt::AlignBottom);
     } else
     {
         executed = false;
+        if (message.isEmpty())
+            message = "Nem támogatott diagram típus: " + chart_type;
     }
 
     executed = queryCount <= 10;
     tooMany = !executed;
 
     notEnough = queryCount == 0;
-    executed = !notEnough;
+    executed = !notEnough && !tooMany;
 
     if (executed)
     {
-        chart->setTitle(
-                    "Diagram rendezve a(z) " + *groupedBy + " oszlop alapján.");
+        chart->setTitle("Diagram rendezve a(z) " + *groupedBy + " oszlop alapján.");
         chart->layout()->setContentsMargins(0, 0, 0, 0);
+        chart->legend()->setVisible(true);
         chart->setTheme(QChart::ChartThemeDark);
         chart->setAnimationOptions(QChart::AllAnimations);
     }
-    else
+    else if (message.isEmpty())
     {
         if (tooMany)
             message = "Kérem ezt a diagramtípust kevesebb adattal használja.";
         else if (notEnough)
             message = "Üres lekérdezés.";
-        else
-            message = "Nem támogatott diagram típus: " + chart_type;
     }
     return executed;
 }
@@ -195,19 +223,14 @@ bool SqlEditor::makeChart(QString& message
 void SqlEditor::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
+    QTextEdit::ExtraSelection selection;
+    const QColor lineColor = QColor(255, 255, 212);
 
-    if (!isReadOnly())
-    {
-        QTextEdit::ExtraSelection selection;
-
-        QColor lineColor = QColor(255, 255, 212);
-
-        selection.format.setBackground(lineColor);
-        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-        selection.cursor = textCursor();
-        selection.cursor.clearSelection();
-        extraSelections.append(selection);
-    }
+    selection.format.setBackground(lineColor);
+    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+    selection.cursor = textCursor();
+    selection.cursor.clearSelection();
+    extraSelections.append(selection);
 
     setExtraSelections(extraSelections);
 }

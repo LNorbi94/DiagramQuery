@@ -4,7 +4,7 @@ ConnectWindow::ConnectWindow(QWidget* parent) :
     QMainWindow(parent)
 {
     QShortcut* shortcut;
-    QGridLayout *layout = new QGridLayout;
+    QGridLayout* layout = new QGridLayout;
     QWidget* widget = new QWidget(this);
     QDesktopWidget* desktop = QApplication::desktop();
     QRect geometry = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter
@@ -23,7 +23,11 @@ ConnectWindow::ConnectWindow(QWidget* parent) :
     layout->addWidget(connectionList, 1, 3, 6, 1);
     shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), connectionList);
     connect( shortcut, &QShortcut::activated
-            , this, &ConnectWindow::deleteConnection);
+             , this, &ConnectWindow::deleteConnection);
+
+    shortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    connect( shortcut, &QShortcut::activated
+            , this, &ConnectWindow::connectToDatabase);
 
     widget->setLayout(layout);
     setCentralWidget(widget);
@@ -34,7 +38,7 @@ ConnectWindow::ConnectWindow(QWidget* parent) :
             , this, &ConnectWindow::load);
 }
 
-void ConnectWindow::setupLabels(QGridLayout *layout)
+void ConnectWindow::setupLabels(QGridLayout* layout)
 {
     QLabel* label = new QLabel();
     label->setText("Hoszt és Port:");
@@ -61,7 +65,7 @@ void ConnectWindow::setupLabels(QGridLayout *layout)
     layout->addWidget(label, 4, 2);
 }
 
-void ConnectWindow::setupLineEdites(QGridLayout *layout)
+void ConnectWindow::setupLineEdites(QGridLayout* layout)
 {
     QLineEdit* lineEdit = new QLineEdit();
     layout->addWidget(lineEdit, 1, 0);
@@ -85,25 +89,32 @@ void ConnectWindow::setupLineEdites(QGridLayout *layout)
     textFields["password"] = lineEdit;
 }
 
-void ConnectWindow::setupButtons(QGridLayout *layout)
+void ConnectWindow::setupButtons(QGridLayout* layout)
 {
     QPushButton* pushButton = new QPushButton();
     pushButton->setText("Mentés");
     layout->addWidget(pushButton, 6, 0);
-    connect( pushButton, &QPushButton::pressed
+    connect( pushButton, &QPushButton::clicked
             , this, &ConnectWindow::save);
 
     pushButton = new QPushButton();
     pushButton->setText("Kapcsolódás");
     pushButton->setDefault(true);
     layout->addWidget(pushButton, 6, 1, 1, 2);
-    connect( pushButton, &QPushButton::pressed
-            , this, &ConnectWindow::on_pbConnect_clicked);
+    connect( pushButton, &QPushButton::clicked
+            , this, &ConnectWindow::connectToDatabase);
 }
 
 void ConnectWindow::deleteConnection() noexcept
 {
-    logic.deleteConnection(connectionList->currentItem());
+    const QString toDelete = connectionList->currentItem()->text();
+    const QString confirmDel = "Biztosan törölni kívánja a(z) %1 nevű kapcsolatot?";
+    bool confirmDelete = confirm( "Törlés megerősítése"
+                                  , confirmDel.arg(toDelete)
+                                  , this);
+
+    if (confirmDelete)
+        logic.deleteConnection(connectionList->currentItem());
 }
 
 void ConnectWindow::fillConnectionList() noexcept
@@ -112,20 +123,14 @@ void ConnectWindow::fillConnectionList() noexcept
     connectionList->addItems(logic.createList());
 }
 
-void ConnectWindow::load(QListWidgetItem* item) noexcept
-{
-    logic.load(textFields, item->text());
-}
-
 void ConnectWindow::save()
 {
-    QInputDialog input;
+    QInputDialog input(this);
     input.setInputMode(QInputDialog::TextInput);
     input.setWindowTitle("Kapcsolat mentése");
     input.setOkButtonText("Mentés");
     input.setCancelButtonText("Mégse");
-    input.setLabelText(
-                "Kérem írja be milyen néven kívánja menteni a kapcsolatot!");
+    input.setLabelText("Kérem írja be milyen néven kívánja menteni a kapcsolatot!");
     input.setBaseSize(QSize(200, 100));
 
     if (!input.exec())
@@ -138,18 +143,18 @@ void ConnectWindow::save()
         {
             QMessageBox::warning(
                 this
-                , tr("Könyvtár létrehozása sikertelen!")
+                , "Könyvtár létrehozása sikertelen!"
                 , errors::DIR_NOT_CREATED);
             return;
         }
     }
 
-    QString connectionName = input.textValue();
+    const QString connectionName = input.textValue();
     if (Q_UNLIKELY(connectionName.isEmpty()))
     {
         QMessageBox::warning(
             this
-            , tr("Név megadása kötelező")
+            , "Név megadása kötelező"
             , errors::EMPTY_NAME);
         return;
     }
@@ -160,13 +165,12 @@ void ConnectWindow::save()
     {
         QMessageBox::warning(
             this
-            , tr("Létező név")
+            , "Létező név"
             , errors::ALREADY_EXISTS);
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, "Megerősítés"
-                                      , "Szeretné felülírni a létező kapcsolatot?"
-                                      , QMessageBox::Yes|QMessageBox::No);
-        if (reply == QMessageBox::No)
+        bool overWrite = confirm("Megerősítés"
+                                 , "Szeretné felülírni a létező kapcsolatot?");
+
+        if (!overWrite)
             return;
     }
 
@@ -175,7 +179,7 @@ void ConnectWindow::save()
     {
         QMessageBox::warning(
             this
-            , tr("Fájl megnyitása")
+            , "Fájl megnyitása"
             , "Fájl megnyitása sikertelen!");
         return;
     }
@@ -184,7 +188,7 @@ void ConnectWindow::save()
     fillConnectionList();
 }
 
-void ConnectWindow::on_pbConnect_clicked()
+void ConnectWindow::connectToDatabase()
 {
     QSqlDatabase* db = new QSqlDatabase(QSqlDatabase::addDatabase("QOCI"));
     db->setHostName(textFields["host"]->text());
@@ -206,7 +210,7 @@ void ConnectWindow::on_pbConnect_clicked()
     {
         QMessageBox::critical(
             this
-            , tr("Hiba történt kapcsolódás közben!")
+            , "Hiba történt kapcsolódás közben!"
             , db->lastError().text());
     }
 }

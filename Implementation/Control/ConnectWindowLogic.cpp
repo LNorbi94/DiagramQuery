@@ -1,6 +1,6 @@
-#include "ConnectWindowsLogic.h"
+#include "ConnectWindowLogic.h"
 
-const QString ConnectWindowsLogic::buildConnectionName(const QString &fname) const noexcept
+QString ConnectWindowLogic::buildConnectionName(const QString &fname) const noexcept
 {
     QString filename = connections::CONFIGFOLDER;
     filename.append(QDir::separator());
@@ -9,7 +9,7 @@ const QString ConnectWindowsLogic::buildConnectionName(const QString &fname) con
     return filename;
 }
 
-void ConnectWindowsLogic::deleteConnection(QListWidgetItem* item) noexcept
+void ConnectWindowLogic::deleteConnection(QListWidgetItem* item)
 {
     const QString filename = buildConnectionName(item->text());
     QFile file(filename);
@@ -20,7 +20,7 @@ void ConnectWindowsLogic::deleteConnection(QListWidgetItem* item) noexcept
     }
 }
 
-const QStringList ConnectWindowsLogic::createList() const noexcept
+const QStringList ConnectWindowLogic::createList() const
 {
     QStringList connectionList;
     QDir dir(connections::CONFIGFOLDER);
@@ -41,7 +41,7 @@ const QStringList ConnectWindowsLogic::createList() const noexcept
     return connectionList;
 }
 
-void ConnectWindowsLogic::save(const QString &connectionName
+void ConnectWindowLogic::save(const QString& connectionName
                                , const std::map<QString, QLineEdit*>& textFields
                                , QFile& file) noexcept
 {
@@ -58,12 +58,13 @@ void ConnectWindowsLogic::save(const QString &connectionName
     stream.writeEndDocument();
 }
 
-void ConnectWindowsLogic::load(std::map<QString, QLineEdit *>& textFields
-                               , const QString& connectionName) const noexcept
+void ConnectWindowLogic::load(std::map<QString, QLineEdit *>& textFields
+                               , const QString& connectionName) const
 {
-    QString filename = buildConnectionName(connectionName);
+    const QString filename = buildConnectionName(connectionName);
     QFile file(filename);
-    using QObject;
+    auto tr = [] (const char* stringToConvert)
+    { return QString(stringToConvert); };
 
     if (Q_LIKELY(file.open(QIODevice::ReadOnly)))
     {

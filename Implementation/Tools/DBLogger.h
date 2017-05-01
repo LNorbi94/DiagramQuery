@@ -1,5 +1,5 @@
-﻿#ifndef DBLOGGER_HPP
-#define DBLOGGER_HPP
+﻿#ifndef DBLOGGER_H
+#define DBLOGGER_H
 
 #include <QTextStream>
 #include <QDir>
@@ -12,7 +12,7 @@
 
 #include <functional>
 
-#include "constants.h"
+#include "Constants.h"
 
 class DBLogger : public QPlainTextEdit
 {
@@ -36,10 +36,6 @@ public:
         logFileStream.setDevice(&logFile);
     }
 
-    /*
-     * Only for the show for now, it doesn't actually show progress.
-     *
-     */
     void setProgressBar(QProgressBar* pB) noexcept
     {
         progressBar = pB;
@@ -58,7 +54,7 @@ public:
 
     bool logWithTime(const QString& success
                      , const QString& fail
-                     , std::function<bool(QString&)>& slowFunc);
+                     , std::function<bool (QString&)>& slowFunc);
     void log(const QString& text, const QString& errorMessage = "");
 
 private:
@@ -67,4 +63,4 @@ private:
     QTextStream logFileStream;
 };
 
-#endif
+#endif // DBLOGGER_H
