@@ -41,7 +41,7 @@ HEADERS  += Control/ConnectWindowLogic.h \
 
 RESOURCES += resources.qrc
 
-win32:CONFIG(release, debug|release):LIBS += -L$$PWD/../Build/release/ -lqsqloci
+win32:CONFIG(release, debug|release):LIBS += -L$$PWD/../Build/release/ #-lqsqloci
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/debug/ -lqsqloci
 else:unix: LIBS += -L$$PWD/../Build/ -lqsqloci
 

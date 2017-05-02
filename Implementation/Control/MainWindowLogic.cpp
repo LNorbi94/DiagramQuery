@@ -71,7 +71,7 @@ QTableView* MainWindowLogic::viewDbObject(const QString& parent
             model->setQuery(*q);
             view->setModel(model);
             const int colCount = model->columnCount();
-            const int width = editor->width() - tables::SIDEBAR_SIZE;
+            const int width = editor->width() - tables::SIDEBAR_SIZE - 20;
             for (int i = 0; i < colCount; ++i)
             {
                 view->setColumnWidth(i, width / colCount);

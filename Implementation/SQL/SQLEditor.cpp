@@ -153,6 +153,7 @@ bool SqlEditor::makeChart(QString& message
     else
     {
         ++groupedBy;
+        *groupedBy = groupedBy->remove(')');
         executed = true;
     }
 
@@ -161,13 +162,22 @@ bool SqlEditor::makeChart(QString& message
         q->previous();
         QPieSeries* series = new QPieSeries();
 
+        QVector<std::pair<QString, double>> values;
+        double sum = 0.0;
+
         while (q->next())
         {
-            series->append(QString("%1 (%2)")
-                           .arg(q->value(0).toString())
-                           .arg(q->value(1).toInt())
-                           , q->value(1).toInt());
+            values.append({ q->value(0).toString(), q->value(1).toDouble() });
+            sum += q->value(1).toDouble();
             ++queryCount;
+        }
+
+        for (auto& pair : values)
+        {
+            double percent = pair.second / sum * 100.0;
+            QString label = QString("%1 ( %2 % )").arg(pair.first)
+                    .arg(percent, 0, 'f', 1, 0);
+            series->append(label, pair.second);
         }
 
         chart->addSeries(series);

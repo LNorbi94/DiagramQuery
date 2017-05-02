@@ -32,7 +32,6 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     setStatusBar(statusBar);
     setWindowIcon(QIcon(":/images/favicon"));
     setGeometry(geometry);
-    setAttribute(Qt::WA_DeleteOnClose);
 
     layout->addWidget(mainSplitter);
     mainSplitter->addWidget(dbObjects);
