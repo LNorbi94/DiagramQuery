@@ -37,7 +37,7 @@
 \usepackage{graphicx} %package to manage images
 \graphicspath{ {pics/} }
 
-\title{\textbf{Integrált adatbázis-fejlesztői környezet SQL-hez}}
+\title{Integrált adatbázis-fejlesztői környezet SQL-hez}
 \author{Lestár Norbert}
 \supervisor{dr Nikovits Tibor}
 \supervisorstitle{Mestertanár}
@@ -119,6 +119,7 @@ Miután létrehoztuk a fájlt el is kezdhetjük a program használatát, tovább
 \includegraphics[width=1.0\textwidth]{Connect}
 A mentett kapcsolatok kezelésére itt is lehetőség van. A \textit{delete} billentyű lenyomására a kijelölt kapcsolat törlődik.
 Lehetőség van az aktuális, képernyőn látható adatok mentésére is. Ekkor egy nevet meg kell adni a kapcsolatnak, ami nem lehet üres.
+Létező név esetén lehetőség van a korábbi kapcsolat felülírására.
 Az adatok helyes megadása után, illetve ha létrejön sikeresen a kapcsolat az adatbázissal, akkor a program beléptet a szerkesztő felülethez.
 Hiba esetén kiírja a hiba kódot, amivel keresse meg adatbázisának adminisztrátorát, vagy nézzen utána az Oracle oldalán.
 
@@ -126,19 +127,57 @@ Néhány példa a hibakódokra:
 \begin{itemize}
   \item \textbf{ORA-12560}: TNS:protocol adapter error; Unable to logon. Ezt okozhatja internet kapcsolat hiánya,
   vagy hiányzó szervernév, azaz ha nem lehet kiépíteni kapcsolatot a szerverrel bármilyen okból.
-  \item \textbf{ORA-01005}: null password given; logon denied; Unable to logon. Ezt a hibaüzenetet akkor kapja az ember,
+  \item \textbf{ORA-01005}: null password given; logon denied; Unable to logon. Ezt a hibaüzenetet akkor fogja ön kapni,
   ha a jelszó mezőt üresen hagyja. (Ha üres a jelszó mező akkor hibás felhasználónév esetén is ez a hibaüzenet jön elő)
   \item \textbf{ORA-01017}: invalid username/password; logon denied; Unable to logon. Hibás felhasználónév vagy jelszó esetén.
 \end{itemize}
 
-Ezek a hibakódok természetesen más esetben is előjöhetnek, ha biztos benne hogy minden rendben van az adatokkal és a
+Ezek a hibakódok természetesen más esetben is előjöhetnek, ha biztos benne hogy minden rendben van az adatokkal, és a
 kapcsolattal, akkor kérjen meg egy hozzáértőt a probléma elhárításában.
 
-Az \href{https://docs.oracle.com/cd/B28359_01/server.111/b28278/toc.htm}{Oracle Docs} oldalon megtalálható minden hibakód, és annak oka (angolul). Legtöbb esetben elég beszédesek, így meg lehet őket érteni utána járás nélkül is,
-persze csak angol tudás birtokában. A későbbiekben is ezen hibakódok vannak használva (és logolva), így ezt az oldalt érdemes lementeni.
+Az \href{https://docs.oracle.com/cd/B28359_01/server.111/b28278/toc.htm}{Oracle Docs} oldalon megtalálható minden hibakód, és annak oka (angolul).
+Legtöbb esetben elég beszédesek, így meg lehet őket érteni a dokumentáció nélkül is.
+A későbbiekben is ezen hibakódok vannak használva (és logolva), így ezt az oldalt érdemes lementeni.
 
 \section{Grafikus felület}
 \includegraphics[width=1.0\textwidth]{gui}
+Sikeres belépés esetén ez a képernyő fogadja a felhasználókat.
+A következő billentyűparancsok használhatak az ablakon belül:
+\begin{itemize}
+  \item \textbf{CTRL+W, illetve CTRL+SHIFT+W}: bezárja alsó, illetve felső lapot. Az alapértelmezett lapokat nem lehet bezárni.
+  \item \textbf{CTRL+ENTER}: A szerkesztőben lévő lekérdezést vagy scriptet végrehajtja. (Kurzor helyzetétől függően.)
+  \item \textbf{F4}: Lekérdezési terv létrehozása.
+  \item \textbf{F3}: Kijelölt lekérdezés végrehajtása.
+  \item \textbf{DELETE}: Adatbázis objektum törlése a bal oldali fából.
+\end{itemize}
+
+A menüben lévő parancsok (Megnyitás, Mentés, Kilépés, stb...) maguktól értetődnek, egy dologra azonban
+felhívnám a figyelmét: Ha időtúllépés miatt kilépteti az adatbázis (ezt az adatbázis karbantartójától megkérdezheti mennyi idő) akkor
+érdemes az újrakapcsolódást választani, mivel ha lekérdezést próbál végrehajtani, akkor az adatbázis sokáig nem fog válaszolni.
+
+\subsection{Lekérdezések}
+A program szerkesztő felületében lehetőség van sql lekérdezések, illetve pl/sql szkriptek végrehajtására. SQL* plus szkriptek viszont
+nem működnek. Ezen utasítások máshol ki vannak fejtve, így ezt itt nem tenném meg. A programban szintaxis kiemeléssel jelennek meg ezek
+az utasítások, így tanulás közben is használható. (De automatikus kitöltés nincsen)
+
+\subsection{Diagramok}
+Kettő különböző típusú diagram lett implementálva a programban, a kör- és oszlopdiagram. A továbbiakban
+ezeknek a szintaxisát részletezem, illetve leírom mikre használhatóak, mivel ezek más adatok
+reprezentációjára alkalmasak.
+Néhány elvárás minden diagramtípussal kapcsolatban:
+\begin{itemize}
+  \item Minden lekérdezésnek legalább 1 sort kell tartalmaznia.
+  \item Típustól függően meg van határozva egy maximum számú sor is.
+  \item GROUP BY típusú lekérdezés használható csak.
+  \item Felesleges oszlopok nem szerepelhetnek a lekérdezésben.
+\end{itemize}
+
+\subsubsection{Kördiagram}
+A kördiagram (http://www.statcan.gc.ca/edu/power-pouvoir/ch9/pie-secteurs/5214826-eng.htm) kategórikus
+adatok megjelenítésére használható.
+
+Szintaxisa a következő:
+MAKE CHART PIECHART ( <SQL lekérdezés> );
 
 \chapter{Fejlesztői dokumentáció}
 
