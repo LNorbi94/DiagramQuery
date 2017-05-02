@@ -191,7 +191,6 @@ bool SqlEditor::makeChart(QString& message
         chart->legend()->setAlignment(Qt::AlignBottom);
     } else
     {
-        executed = false;
         if (message.isEmpty())
             message = "Nem támogatott diagram típus: " + chart_type;
     }

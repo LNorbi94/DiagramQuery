@@ -14,7 +14,6 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
                                          , QSize(1024, 768)
                                          , desktop->availableGeometry());
     QWidget* widget = new QWidget(this);
-    DBLogger* logger = new DBLogger(this, progressBar);
     QSplitter* mainSplitter = new QSplitter;
     QSplitter* sideSplitter = new QSplitter;
     SqlHighlighter * highLighter = new SqlHighlighter();
@@ -26,6 +25,7 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     serverOutput = new ServerOutput(&db, dbmsOutput);
     const QString dbName = db.hostName();
     progressBar = new QProgressBar(statusBar);
+    DBLogger* logger = new DBLogger(this, progressBar);
 
     widget->setLayout(layout);
     setCentralWidget(widget);
@@ -186,19 +186,19 @@ void MainWindow::dbObjectsClicked(QTreeWidgetItem* item, int /*column*/)
 
     if (queries::TABLES == item->text(0))
     {
-        toFill = fillTableList;
+        toFill = &MainWindow::fillTableList;
     }
     else if (queries::INDEXES == item->text(0))
     {
-        toFill = fillIndexList;
+        toFill = &MainWindow::fillIndexList;
     }
     else if (queries::VIEWS == item->text(0))
     {
-        toFill = fillViewList;
+        toFill = &MainWindow::fillViewList;
     }
     else if (queries::FUNCTIONS == item->text(0))
     {
-        toFill = fillFunctionList;
+        toFill = &MainWindow::fillFunctionList;
     }
     else
     {

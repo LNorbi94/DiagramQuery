@@ -45,6 +45,7 @@ public:
         delete editor;
         delete boxes;
         delete dbObjects;
+        delete logic;
     }
 
 private slots:
