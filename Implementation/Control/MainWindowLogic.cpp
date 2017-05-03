@@ -232,8 +232,7 @@ void MainWindowLogic::executeString(const QString& query
 
     if (words.size() >= 1 && "SELECT" == words.at(0))
     {
-        logger->logWithTime(
-                            "Lekérdezés sikeresen végrehajtva!"
+        logger->logWithTime("Lekérdezés sikeresen végrehajtva!"
                           , "Lekérdezés sikertelen."
                           , toExecute);
     }

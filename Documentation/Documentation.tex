@@ -13,6 +13,7 @@
 \definecolor{dkgreen}{rgb}{0, 0.6, 0}
 \definecolor{grey}{rgb}{0.5, 0.5, 0.5}
 \definecolor{mauve}{rgb}{0.58, 0, 0.82}
+\definecolor{awesomeblue}{rgb}{0.27, 0.34, 0.53}
 
 \lstset{
   frame = tb,
@@ -116,7 +117,10 @@ Egy konkrét példa a fájlra: (port megadása nélkül)
 Miután létrehoztuk a fájlt el is kezdhetjük a program használatát, további beállításra nincs szükség.
 
 \section{Kapcsolódás}
-\includegraphics[width=1.0\textwidth]{Connect}
+\begin{figure}[ht]
+  \includegraphics[width=1.0\textwidth]{Connect}
+ \caption{Kapcsolódási ablak}
+\end{figure}
 A mentett kapcsolatok kezelésére itt is lehetőség van. A \textit{delete} billentyű lenyomására a kijelölt kapcsolat törlődik.
 Lehetőség van az aktuális, képernyőn látható adatok mentésére is. Ekkor egy nevet meg kell adni a kapcsolatnak, ami nem lehet üres.
 Létező név esetén lehetőség van a korábbi kapcsolat felülírására.
@@ -140,7 +144,10 @@ Legtöbb esetben elég beszédesek, így meg lehet őket érteni a dokumentáci�
 A későbbiekben is ezen hibakódok vannak használva (és logolva), így ezt az oldalt érdemes lementeni.
 
 \section{Grafikus felület}
-\includegraphics[width=1.0\textwidth]{gui}
+\begin{figure}[ht]
+    \includegraphics[width=1.0\textwidth]{gui}
+ \caption{Felhasználói felület}
+\end{figure}
 Sikeres belépés esetén ez a képernyő fogadja a felhasználókat.
 A következő billentyűparancsok használhatak az ablakon belül:
 \begin{itemize}
@@ -156,7 +163,7 @@ felhívnám a figyelmét: Ha időtúllépés miatt kilépteti az adatbázis (ezt
 érdemes az újrakapcsolódást választani, mivel ha lekérdezést próbál végrehajtani, akkor az adatbázis sokáig nem fog válaszolni.
 
 \subsection{Lekérdezések}
-A program szerkesztő felületében lehetőség van sql lekérdezések, illetve pl/sql szkriptek végrehajtására. SQL* plus szkriptek viszont
+A program szerkesztő felületében lehetőség van sql lekérdezések, illetve PL/SQL szkriptek végrehajtására. SQL* Plus szkriptek viszont
 nem működnek. Ezen utasítások máshol ki vannak fejtve, így ezt itt nem tenném meg. A programban szintaxis kiemeléssel jelennek meg ezek
 az utasítások, így tanulás közben is használható. (De automatikus kitöltés nincsen)
 
@@ -164,20 +171,53 @@ az utasítások, így tanulás közben is használható. (De automatikus kitölt
 Kettő különböző típusú diagram lett implementálva a programban, a kör- és oszlopdiagram. A továbbiakban
 ezeknek a szintaxisát részletezem, illetve leírom mikre használhatóak, mivel ezek más adatok
 reprezentációjára alkalmasak.
+
 Néhány elvárás minden diagramtípussal kapcsolatban:
 \begin{itemize}
   \item Minden lekérdezésnek legalább 1 sort kell tartalmaznia.
   \item Típustól függően meg van határozva egy maximum számú sor is.
   \item GROUP BY típusú lekérdezés használható csak.
-  \item Felesleges oszlopok nem szerepelhetnek a lekérdezésben.
+  \item Felesleges oszlopok nem szerepelhetnek a lekérdezésben. (azaz amiket nem használ a diagram)
 \end{itemize}
 
 \subsubsection{Kördiagram}
-A kördiagram (http://www.statcan.gc.ca/edu/power-pouvoir/ch9/pie-secteurs/5214826-eng.htm) kategórikus
-adatok megjelenítésére használható.
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics{piechart}
+  \end{center}
+ \caption{Kördiagram}
+\end{figure}
 
+A kördiagram kategórikus adatok megjelenítésére használható.
 Szintaxisa a következő:
-MAKE CHART PIECHART ( <SQL lekérdezés> );
+\textbf{{\color{awesomeblue} MAKE CHART PIECHART }} ( \textbf{<SQL lekérdezés>} );
+
+\textbf{Kördiagram tulajdonságai:}
+\begin{itemize}
+  \item Legalább 2, legfeljebb 20 elemmel használható.
+  \item 2 oszlopos lekérdezéssel lehet használni; második oszlopnak egy aggregáló függvénynek kell lennie.
+  \item Érdemes csökkenő sorrendben lekérni az elemeket, de ez teljes mértékben a felhasználóra van bízva.
+  \item A címkékben százalékosan jelennek meg az adatok. (Kerekítés miatt lehet benne hiba)
+\end{itemize}
+
+\subsubsection{Oszlopdiagram}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.9]{barchart}
+  \end{center}
+ \caption{Oszlopdiagram}
+\end{figure}
+
+Az oszlopdiagram kategórikus adatok megjelenítésére használható.
+Szintaxisa a következő:
+\textbf{{\color{awesomeblue} MAKE CHART BARCHART }} ( \textbf{<SQL lekérdezés>} );
+
+\textbf{Oszlopdiagram tulajdonságai:}
+\begin{itemize}
+  \item Legalább 2, legfeljebb 10 elemmel használható.
+  \item 2 oszlopos lekérdezéssel lehet használni; második oszlopnak egy aggregáló függvénynek kell lennie.
+  \item Érdemes eredeti sorrendben meghagyni az adatokat, hogy könnyen megfigyelhessük a kiugró adatokat.
+\end{itemize}
 
 \chapter{Fejlesztői dokumentáció}
 

@@ -182,6 +182,9 @@ bool SqlEditor::makeChart(QString& message
 
         chart->addSeries(series);
         chart->legend()->setAlignment(Qt::AlignLeft);
+
+        executed = queryCount <= 20;
+        tooMany = !executed;
     } else if ("BARCHART" == chart_type && executed)
     {
         q->previous();
@@ -199,16 +202,16 @@ bool SqlEditor::makeChart(QString& message
 
         chart->addSeries(series);
         chart->legend()->setAlignment(Qt::AlignBottom);
+
+        executed = queryCount <= 10;
+        tooMany = !executed;
     } else
     {
         if (message.isEmpty())
             message = "Nem támogatott diagram típus: " + chart_type;
     }
 
-    executed = queryCount <= 10;
-    tooMany = !executed;
-
-    notEnough = queryCount == 0;
+    notEnough = queryCount <= 1;
     executed = !notEnough && !tooMany;
 
     if (executed)
