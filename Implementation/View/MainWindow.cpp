@@ -10,8 +10,16 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     , lowerTabIndex(0)
 {
     QDesktopWidget* desktop = QApplication::desktop();
+    QSize size(1024, 768);
+    QRect tempGeometry = desktop->availableGeometry();
+    if (tempGeometry.width() < 1200)
+    {
+        const int width = tempGeometry.width() - 200;
+        const int height = tempGeometry.height() - 100;
+        size = QSize(width, height);
+    }
     QRect geometry = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter
-                                         , QSize(1024, 768)
+                                         , size
                                          , desktop->availableGeometry());
     QWidget* widget = new QWidget(this);
     QSplitter* mainSplitter = new QSplitter;
@@ -25,7 +33,7 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     serverOutput = new ServerOutput(&db, dbmsOutput);
     const QString dbName = db.hostName();
     progressBar = new QProgressBar(statusBar);
-    DBLogger* logger = new DBLogger(this, progressBar);
+    DBLogger* logger = new DBLogger(boxes, progressBar);
 
     widget->setLayout(layout);
     setCentralWidget(widget);
@@ -64,6 +72,7 @@ MainWindow::MainWindow(QSqlDatabase& database, QWidget * parent) :
     createMenuBar();
 
     logic = new MainWindowLogic(logger, &db, queries);
+    logic->setBoxes(boxes);
 
     if (db.isOpen())
         logger->appendPlainText("Sikeresen csatlakozva az adatbázishoz!");
@@ -140,6 +149,15 @@ void MainWindow::createMenuBar()
                     , &MainWindow::savePage, QKeySequence::Save);
     menu->addAction("Kilépés", this
                     , &MainWindow::exit, QKeySequence(Qt::CTRL + Qt::Key_Q));
+
+    menu = new QMenu;
+    menu->setTitle("Szerkesztés");
+    menuBar->addMenu(menu);
+
+    menu->addAction("Parancs futtatása", this, &MainWindow::executeQuery);
+    menu->addAction("Kijelölés futtatása", this, &MainWindow::executeSelection);
+    menu->addAction("Lekérdezési terv megjelenítése"
+                    , this, &MainWindow::showExecutionPlan);
 
     menu = new QMenu;
     menu->setTitle("Adatbázis");
@@ -229,13 +247,17 @@ void MainWindow::showExecutionPlan()
 
 void MainWindow::executeSelection()
 {
-    const QString query = queries->textCursor().selectedText().simplified();
+    QString query = queries->textCursor().selectedText().simplified();
+    if (!queries->isPlSql(query))
+        query = query.remove(';');
+
     executeString(query);
 }
 
 void MainWindow::executeString(const QString& query)
 {
-    logic->executeString(query, editor, boxes);
+    serverOutput->prepareWrite();
+    logic->executeString(query, editor);
     serverOutput->writeOutput();
 }
 

@@ -58,3 +58,5 @@ Implementation/QueryCreator\.aps
 Implementation/resource\.h
 
 microsoft/\.qmake\.stash
+
+Documentation/Output/

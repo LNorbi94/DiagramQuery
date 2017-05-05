@@ -83,6 +83,7 @@ QTableView* MainWindowLogic::viewDbObject(const QString& parent
         return success;
     };
 
+    boxes->setCurrentWidget(logger);
     logger->logWithTime("Adatbázisban található objektum sikeresen lekérdezve."
                        , "Hiba történt a lekérdezés végrehajtása közben!"
                        , toExecute);
@@ -93,6 +94,7 @@ QTableView* MainWindowLogic::viewDbObject(const QString& parent
 
 void MainWindowLogic::dbObjectClicked(std::function<bool (QString&)>& toExecute)
 {
+    boxes->setCurrentWidget(logger);
     logger->logWithTime("Adatbázisban található objektumok sikeresen lekérdezve."
                        , "Hiba történt a lekérdezés végrehajtása közben!"
                        , toExecute);
@@ -101,6 +103,7 @@ void MainWindowLogic::dbObjectClicked(std::function<bool (QString&)>& toExecute)
 bool MainWindowLogic::createList(const QString& queryToExecute
                                  , QList<QTreeWidgetItem *>& list)
 {
+    boxes->setCurrentWidget(logger);
     QSqlQuery query;
     query.setForwardOnly(true);
     query.exec(queryToExecute);
@@ -119,12 +122,23 @@ bool MainWindowLogic::createList(const QString& queryToExecute
 
 QTreeWidget* MainWindowLogic::createExecutionPlan(const int width)
 {
+    boxes->setCurrentWidget(logger);
     QTreeWidget* tree = new QTreeWidget();
 
     std::function<bool(QString&)> toExecute = [&] (QString& failMessage)
     {
         QSqlQuery* q = new QSqlQuery(*db);
-        QString query = queries->extractQuery();
+        QString query;
+        QString selectedText = queries->textCursor().selectedText();
+        if (!selectedText.isEmpty())
+        {
+            selectedText = selectedText.remove(';');
+            query = selectedText;
+        }
+        else
+        {
+            query = queries->extractQuery();
+        }
         QString explainPlan = QString(
                     "EXPLAIN PLAN SET STATEMENT_ID = 'temp1' FOR %1"
                     ).arg(query);
@@ -195,10 +209,9 @@ QTreeWidget* MainWindowLogic::createExecutionPlan(const int width)
     return tree;
 }
 
-void MainWindowLogic::executeString(const QString& query
-                                    , QTabWidget* editor, QTabWidget* boxes)
+void MainWindowLogic::executeString(const QString& query, QTabWidget* editor)
 {
-
+    boxes->setCurrentWidget(logger);
     if (query.isEmpty())
     {
         logger->log("Hiba: üres lekérdezést próbált végrehajtani!");

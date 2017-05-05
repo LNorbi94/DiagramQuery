@@ -31,7 +31,12 @@ public:
                 , this, &SqlEditor::highlightCurrentLine);
 
         setAcceptRichText(false);
-        setFont(QFont("Segoe UI", 11));
+        QFont font("Segoe UI", 11);
+        setFont(font);
+
+        const int tabSize = 4;
+        QFontMetrics metrics(font);
+        setTabStopWidth(tabSize * metrics.width(' '));
     }
 
     QString extractQuery() noexcept;

@@ -6,7 +6,7 @@
 
 #include <QPlainTextEdit>
 #include <QProgressBar>
-
+#include <QTabWidget>
 #include <QTime>
 #include <QElapsedTimer>
 
@@ -37,9 +37,7 @@ public:
     }
 
     void setProgressBar(QProgressBar* pB) noexcept
-    {
-        progressBar = pB;
-    }
+    { progressBar = pB; }
 
     void appendPlainText(const QString& text) noexcept
     {

@@ -55,14 +55,12 @@ QString SqlEditor::extractQuery() noexcept
     query = query.simplified();
 
     if (!isPlSql(query))
-    {
         query = query.remove(';');
-    }
 
     return query;
 }
 
-bool SqlEditor::isPlSql(const QString &query)
+bool SqlEditor::isPlSql(const QString& query)
 {
     bool itIsPlSql = false;
 

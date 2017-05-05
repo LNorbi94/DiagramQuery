@@ -16,9 +16,12 @@ public:
 
     void writeOutput();
     void prepareWrite()
-    { db->exec(QString("CREATE TABLE %1 (line varchar2(100) )").arg(tableName)); }
+    { db->exec(QString("CREATE TABLE %1 (line varchar2(100))").arg(tableName)); }
     void clean()
-    { db->exec(QString("DELETE FROM %1").arg(tableName)); }
+    {
+        db->exec(QString("DELETE FROM %1").arg(tableName));
+        db->exec(QString("DROP TABLE %1").arg(tableName));
+    }
 
 private:
     QSqlDatabase* db;

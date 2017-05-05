@@ -28,12 +28,15 @@ public:
     bool createList(const QString& queryToExecute
                     , QList<QTreeWidgetItem*>& list);
     QTreeWidget* createExecutionPlan(const int width);
-    void executeString(const QString& query, QTabWidget* editor, QTabWidget* boxes);
+    void executeString(const QString& query, QTabWidget* editor);
+    void setBoxes(QTabWidget* thatBoxes)
+    { boxes = thatBoxes; }
 
 private:
     DBLogger* logger;
     QSqlDatabase* db;
     SqlEditor* queries;
+    QTabWidget* boxes;
 };
 
 #endif // MAINWINDOWLOGIC_H

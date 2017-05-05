@@ -1,82 +1,3 @@
-\documentclass{elteikthesis}
-
-\usepackage{ucs}
-\usepackage[utf8x]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[english, hungarian]{babel}
-\usepackage{hyperref}
-\selectlanguage{hungarian}
-
-\usepackage{listings}
-\usepackage{color}
-
-\definecolor{dkgreen}{rgb}{0, 0.6, 0}
-\definecolor{grey}{rgb}{0.5, 0.5, 0.5}
-\definecolor{mauve}{rgb}{0.58, 0, 0.82}
-\definecolor{awesomeblue}{rgb}{0.27, 0.34, 0.53}
-
-\lstset{
-  frame = tb,
-  language = xml,
-  aboveskip = 3mm,
-  belowskip = 3mm,
-  showstringspaces = false,
-  columns = flexible,
-  basicstyle = {\small\ttfamily},
-  numbers = none,
-  numberstyle = \tiny\color{grey},
-  keywordstyle = \color{blue},
-  commentstyle = \color{dkgreen},
-  stringstyle = \color{mauve},
-  breaklines = true,
-  breakatwhitespace = true,
-  tabsize = 3
-}
-
-\usepackage[rightcaption]{sidecap}
- 
-\usepackage{graphicx} %package to manage images
-\graphicspath{ {pics/} }
-
-\title{Integrált adatbázis-fejlesztői környezet SQL-hez}
-\author{Lestár Norbert}
-\supervisor{dr Nikovits Tibor}
-\supervisorstitle{Mestertanár}
-\period{Programtervező informatikus BSc}
-\thesisyear{2017}
-\department{Információs Rendszerek Tanszék}
-
-\begin{document}
-
-\frontmatter
-
-	\maketitle
-	\tableofcontents
-	
-\mainmatter
-
-\chapter{Bevezetés} 
-Nem minden felhasználó ért az SQL-hez, részben ezért lehet szükség egy integrált fejlesztői
-környezetre. A szintaxis kiemelésnek köszönhetően így könnyű észrevenni és javítani a hibákat,
-valamint lényegesen gyorsabban meg lehet tanulni az SQL-t. Bizonyos műveleteket akár az SQL teljes
-ismerete nélkül is elvégezhet bárki. Továbbá tapasztalt felhasználóknak is hasznos eszköz, mert
-letisztult és átlátható felületet biztosít az adatbázis objektumainak megtekintésére. Ezen felül a
-diagramok segítségével könnyen leolvashatóvá válnak az adatbázis különböző tulajdonságai, valamint
-az egyedi, felhasználó által létrehozott táblák is.
-A megvalósított program képes ezekre:
-egy szerkesztőn lehetőség nyílik SQL, illetve PL/SQL kód leírására,
-esetleg ha már van kész kód akkor annak betöltésére.
-Oracle SQL adatbázishoz lehet csatlakozni, és
-csatlakozás után a felhasználói felület segítségével különböző dolgokra nyílik lehetőség:
-\begin{itemize}
-  \item Adatbázisban megtalálható objektumok megtekintésére, törlésére, illetve újak létrehozására,
-  \item program használata során kipróbált SQL, illetve PL/SQL parancsok mentésére,
-  \item különböző diagramok (kördiagram, oszlopdiagram) megtekintésére lekérdezések segítségével,
-  \item szintaxis kiemelésre (diagramokat létrehozó utasítás esetén is),
-  \item valamint lekérdezési tervek megtekintésére is.
-\end{itemize}
-A programomat \textit{DiagramQuery} néven fogom a továbbiakban említeni.
-
 \chapter{Felhasználói dokumentáció}
 \textit{DiagramQuery} első sorban lehetőséget biztosít egy Oracle SQL adatbázishoz való kapcsolódásra.
 A kapcsolatokat tartalmazó adatokat el is lehet menteni (illetve lehetőség van kézzel leírni,
@@ -118,7 +39,7 @@ Miután létrehoztuk a fájlt el is kezdhetjük a program használatát, tovább
 
 \section{Kapcsolódás}
 \begin{figure}[ht]
-  \includegraphics[width=1.0\textwidth]{Connect}
+  \includegraphics{connect}
  \caption{Kapcsolódási ablak}
 \end{figure}
 A mentett kapcsolatok kezelésére itt is lehetőség van. A \textit{delete} billentyű lenyomására a kijelölt kapcsolat törlődik.
@@ -183,14 +104,14 @@ Néhány elvárás minden diagramtípussal kapcsolatban:
 \subsubsection{Kördiagram}
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics{piechart}
+    \includegraphics[width=1.0\textwidth]{piechart}
   \end{center}
  \caption{Kördiagram}
 \end{figure}
 
 A kördiagram kategórikus adatok megjelenítésére használható.
 Szintaxisa a következő:
-\textbf{{\color{awesomeblue} MAKE CHART PIECHART }} ( \textbf{<SQL lekérdezés>} );
+\textbf{{\color{awesomeblue} MAKE CHART PIECHART }} ( \textbf{$<$SQL lekérdezés$>$} );
 
 \textbf{Kördiagram tulajdonságai:}
 \begin{itemize}
@@ -203,14 +124,14 @@ Szintaxisa a következő:
 \subsubsection{Oszlopdiagram}
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[scale=0.9]{barchart}
+    \includegraphics[width=1.0\textwidth]{barchart}
   \end{center}
  \caption{Oszlopdiagram}
 \end{figure}
 
 Az oszlopdiagram kategórikus adatok megjelenítésére használható.
 Szintaxisa a következő:
-\textbf{{\color{awesomeblue} MAKE CHART BARCHART }} ( \textbf{<SQL lekérdezés>} );
+\textbf{{\color{awesomeblue} MAKE CHART BARCHART }} ( \textbf{$<$SQL lekérdezés$>$} );
 
 \textbf{Oszlopdiagram tulajdonságai:}
 \begin{itemize}
@@ -218,7 +139,3 @@ Szintaxisa a következő:
   \item 2 oszlopos lekérdezéssel lehet használni; második oszlopnak egy aggregáló függvénynek kell lennie.
   \item Érdemes eredeti sorrendben meghagyni az adatokat, hogy könnyen megfigyelhessük a kiugró adatokat.
 \end{itemize}
-
-\chapter{Fejlesztői dokumentáció}
-
-\end{document}

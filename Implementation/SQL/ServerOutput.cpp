@@ -21,8 +21,6 @@ ServerOutput::~ServerOutput()
 
 void ServerOutput::writeOutput()
 {
-    prepareWrite();
-
     db->exec(QString("DECLARE \
             v_status  INTEGER := 0; \
             v_line    VARCHAR2(100); \
