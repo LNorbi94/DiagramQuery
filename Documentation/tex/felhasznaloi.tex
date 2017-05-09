@@ -29,25 +29,29 @@ Lehetőség van későbbi fejlesztések során további adatbázis-kezelők hozz
 manuálisan kell telepíteni az előbb leírtak szerint.
 Telepítés után lehetőség van manuálisan létrehozni kapcsolatokat. Ha ezt kívánja tenni hozzon létre egy
 \textit{Connections} mappát a futtatható állomány főkönyvtárába, és hozzon létre egy .xml kiterjesztésű fájlt a kívánt névvel.
-A fájl felépítése a következő legyen:
-\begin{itemize}
-  \item Connection címkék között legyen elhelyezve az egész, illetve legyen a címkének egy attribútuma: name, a kapcsolat nevével,
-  \item host címkék között a kapcsolat címe legyen,
-  \item port címkék között legyen megadva a kapcsolat portja,
-  \item service címkék között legyen a szerviz neve,
-  \item illetve username címkék között a bejelentkezéshez szükséges felhasználónév.
-\end{itemize}
-Ha valamelyik mezőt nem szeretné eltárolni, akkor azt címkével együtt hagyja ki.
-Egy konkrét példa a fájlra: (port megadása nélkül)
+
+Egy konkrét példa a fájlra:
 
 \begin{lstlisting}
   <?xml version="1.0" encoding="UTF-8"?>
   <Connection name="Elte">
       <host>aramis.inf.elte.hu</host>
+      <port>1521</port>
       <service>eszakigrid97</service>
       <username>A8UZ7T</username>
   </Connection>
 \end{lstlisting}
+
+A fájl felépítése a következő legyen:
+\begin{itemize}
+  \item A második (és hetedik) sorhoz hasonlóan Connection címkék között legyen elhelyezve az egész kód, illetve legyen a
+  nyitócímkének egy attribútuma: name, a kapcsolat nevével,
+  \item host címkék között a kapcsolat címe legyen a harmadik sorban látható módon,
+  \item port címkék között legyen megadva a kapcsolat portja úgy, ahogy a negyedik sorban látható,
+  \item service címkék között legyen a szerviz neve az ötödik sorhoz hasonlóan,
+  \item illetve username címkék között a bejelentkezéshez szükséges felhasználónév ugyanúgy mint a hatodik sorban.
+\end{itemize}
+Ha valamelyik mezőt nem szeretné eltárolni, akkor azt címkével együtt hagyja ki.
 
 Miután létrehoztuk a fájlt el is kezdhetjük a program használatát, további beállításra nincs szükség.
 \begin{figure}[ht]
