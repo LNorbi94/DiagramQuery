@@ -20,12 +20,12 @@ private:
         QTextCharFormat format;
     };
 
-    QVector<Rule> _rules;
+    QVector<Rule> rules;
 
-    QTextCharFormat _keywordForm;
-    QTextCharFormat _functionForm;
-    QTextCharFormat _commentForm;
-    QTextCharFormat _literalForm;
+    QTextCharFormat keywordForm;
+    QTextCharFormat functionForm;
+    QTextCharFormat commentForm;
+    QTextCharFormat literalForm;
 };
 
 #endif // SQLHIGHLIGHTER_H

@@ -60,3 +60,7 @@ Implementation/resource\.h
 microsoft/\.qmake\.stash
 
 Documentation/Output/
+
+Documentation/\.vscode/
+
+*.aux

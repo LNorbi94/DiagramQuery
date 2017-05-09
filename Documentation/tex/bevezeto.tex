@@ -1,21 +1,38 @@
 \chapter{Bevezetés}
 
-Vannak felhasználók akik szeretnének \textit{SQL}-t tanulni, ennek több módja is van.
-Egyik mód egy integrált fejlesztői környezet használata, ami kényelmes
+A szoftverfejlesztést nagyban meghatározza milyen fejlesztői környezetben végezzük a fejlesztést. A fejlesztői
+környezet az, amiben létrejön a szoftverfejlesztés folyamata során a kész program, avagy amiben
+lehet fordítani, és tesztelni az általunk írt kódot. Egy integrált fejlesztői környezet ezt bővíti
+ki olyan eszközökkel, amelyek segítségével a fejlesztés kényelmesebb, gyorsabb lesz, így egy
+hatékonyabb eszközt adva a fejlesztő kezébe. Ezzel szemben nem csak tapasztalt programozók tarthatnak igényt
+egy ilyen környezetre, hanem kevésbé tapasztalt, jelenleg tanuló felhasználók is.
+
+Jelenlegi program ezeknek a felhasználóknak is hasznos lehet, akik jelenleg csak ismerkednek az SQL-el. 
+Ezen felhasználók többféleképpen is nekikezdhetnek a tanulásnak, erre az
+egyik mód egy integrált fejlesztői környezet használata, ami kényelmes
 felületet biztosít a tanuláshoz, többek között a szintaxis kiemelésnek,
 illetve a könnyen szerkeszthető, és futtatható lekérdezések segítségével.
+
+Azt is megemlíteném mire jó az SQL: maga a nyelv mögötti szerver képes biztonságosan tárolni nagy
+mennyiségű adatokat, hiba esetén helyreállítani azokat, illetve lehetőség van a különböző adattáblák indexelésére
+ami felgyorsíthatja a lekérdezéseket, de ezen kívül számos pozitív (és persze negatív) tulajdonsága is van,
+ami jelenlegi program szempontjából nem annyira lényeges. Felmerülhet az igény hogy ezeket az adatmennyiségeket
+(például napi adatgyűjtés a felhasználók szokásairól) valamilyen szempont alapján megfigyeljük, megjelenítsük.
+Erre szolgál az ebben a programban létrehozható diagramok: ha megfelelően lekérdezzük az adatokat jól látható
+eredményeket kapunk, amik segíthetnek bizonyos szolgáltatások fejlesztésében.
+
 A szerkesztőfelületnek köszönhetően ha hibát ejt a felhasználó azt könnyen
-javíthatja, és elmentheti munkáját, illetve betölthet korábban létrehozott
-\textit{SQL} fájlokat is. A szintaxis kiemelésnek köszönhetően így könnyű észrevenni,
-és javítani a hibákat, valamint lényegesen gyorsabban meg lehet tanulni az \textit{SQL}
-nyelvet. Bizonyos műveleteket akár az \textit{SQL} teljes ismerete nélkül is elvégezhet bárki:
-adatbázis objektumok megtekintését, törlését.
-Továbbá tapasztalt felhasználóknak is hasznos eszköz, könnyebben tudnak \textit{SQL}
-lekérdezéseket, illetve szkripteket készíteni és futtatni. Emellett képes megjeleníteni
+javíthatja, valamint elmentheti munkáját, illetve betölthet korábban létrehozott
+SQL fájlokat is. A szintaxis kiemelésnek köszönhetően könnyű észrevenni,
+és javítani a hibákat, sőt lényegesen gyorsabban meg lehet tanulni az SQL
+nyelvet. Bizonyos műveleteket akár az SQL teljes ismerete nélkül is elvégezhet bárki:
+adatbázis objektumok megtekintését, törlését, esetlegesen korábban létrehozott lekérdezésekből
+diagramok megjelenítését.
+Továbbá tapasztalt felhasználóknak is hasznos eszköz, könnyebben tudnak SQL
+lekérdezéseket, illetve szkripteket készíteni, és futtatni. Emellett képes megjeleníteni
 SQL lekérdezéseknek a lekérdezési tervét.
 
-Ez a program egy ilyen integrált fejlesztői környezetet valósít meg. Ezen felül a lekérdezések
-diagramokba rendezhetőek, így egy szemléletesebb eszközt adva adataink megjelenítésére. Mivel az
-implementáció Qt segítségével történt, így könnyen bővíthető a program további adatbázis szerverek
-használatára, de a program csak Oracle SQL adatbázis szerverhez képes csatlakozni.
-A programot \textit{DiagramQuery} néven fogjuk a továbbiakban említeni.
+Mindezen funkciók megvalósítás volt a célom a program írása közben. Mivel az
+implementáció Qt keretrendszer segítségével történt, így könnyen bővíthető a program további adatbázis szerverek
+használatával, azonban a program csak Oracle SQL adatbázis szerverhez képes csatlakozni.
+A programot \textit{DiagramQuery} néven fogom a továbbiakban említeni.

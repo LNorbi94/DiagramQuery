@@ -13,10 +13,10 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
 	Rule rule;
 	QStringList keywordPatterns;
 
-	_keywordForm.setForeground(QColor(0, 0, 0));
-	_keywordForm.setFontWeight(QFont::Bold);
-	_functionForm.setForeground(QColor(70, 87, 137));
-	_functionForm.setFontWeight(QFont::Bold);
+	keywordForm.setForeground(QColor(0, 0, 0));
+	keywordForm.setFontWeight(QFont::Bold);
+	functionForm.setForeground(QColor(70, 87, 137));
+	functionForm.setFontWeight(QFont::Bold);
 
 	keywordPatterns.reserve(128);
 	keywordPatterns << "\\baccess\\b"		<< "\\badd\\b"		<< "\\ball\\b"
@@ -62,11 +62,11 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
                     << "\\bif\\b" << "\\bwhen\\b" << "\\bloop\\b"
                     << "\\bthen\\b" << "\\bis\\b" << "\\bprocedure\\b"
                     << "\\bfunction\\b"  << "\\bpackage\\b";
-	rule.format = _keywordForm;
+	rule.format = keywordForm;
 	for (auto& pattern : keywordPatterns)
 	{
 		rule.pattern = QRegExp(pattern);
-		_rules.append(rule);
+		rules.append(rule);
 	}
 
 	keywordPatterns.clear();
@@ -180,28 +180,28 @@ SqlHighlighter::SqlHighlighter(QTextDocument * parent)
                     << "\\biteration_number\\b" << "\\bpresentnnv\\b"
                     << "\\bmake\\b" << "\\bchart\\b" << "\\bpiechart\\b"
                     << "\\bbarchart\\b" << "\\bpresentv\\b";
-	rule.format = _functionForm;
+	rule.format = functionForm;
     for (const auto& pattern : keywordPatterns)
 	{
 		rule.pattern = QRegExp(pattern);
-		_rules.append(rule);
+		rules.append(rule);
 	}
 
 	rule.pattern = QRegExp("\\btranslate\\b \\w+ \\busing\\b");
-    _rules.append(rule);
+    rules.append(rule);
 
-	_commentForm.setForeground(Qt::gray);
+	commentForm.setForeground(Qt::gray);
 	rule.pattern = QRegExp("--[^\\n]*");
-	rule.format = _commentForm;
-	_rules.append(rule);
+	rule.format = commentForm;
+	rules.append(rule);
 
     rule.pattern = QRegExp("/\\*([^/]|[^*]/)*\\*/");
-    _rules.append(rule);
+    rules.append(rule);
 
-	_literalForm.setForeground(QColor(221, 17, 68));
+	literalForm.setForeground(QColor(221, 17, 68));
     rule.pattern = QRegExp("'[^']*'");
-	rule.format = _literalForm;
-	_rules.append(rule);
+	rule.format = literalForm;
+	rules.append(rule);
 
 }
 
@@ -217,12 +217,12 @@ void SqlHighlighter::highlightBlock(const QString & text)
 		while (index >= 0)
 		{
 			int length = expression.matchedLength();
-			setFormat(index, length, _literalForm);
+			setFormat(index, length, literalForm);
 			index = expression.indexIn(alteredText, index + length);
 		}
 	}
 
-    for (const auto& rule : _rules)
+    for (const auto& rule : rules)
 	{
         expression = rule.pattern;
 		int index = expression.indexIn(alteredText);

@@ -318,6 +318,7 @@ void MainWindow::reconnect()
 
     QLineEdit* userName = new QLineEdit(&dialog);
     form.addRow("Felhasználónév: ", userName);
+    userName->setText(db.userName());
 
     QLineEdit* password = new QLineEdit(&dialog);
     password->setEchoMode(QLineEdit::Password);
@@ -340,7 +341,7 @@ void MainWindow::reconnect()
             QMessageBox::warning(
                 this
                 , "Felhasználónév megadása"
-                , "Kérem adjon meg felhasználónevet!");
+                , "Kérem adjon meg egy felhasználónevet!");
             return;
         }
         if (password->text().isEmpty())
@@ -353,6 +354,21 @@ void MainWindow::reconnect()
         }
         db.open(userName->text(), password->text());
         password->setText("");
+        if (db.isOpen())
+        {
+
+            QMessageBox::information(
+                this
+                , "Kapcsolódva"
+                , "Sikeres újrakapcsolódás!");
+        }
+        else
+        {
+            QMessageBox::warning(
+                this
+                , "Sikertelen kapcsolódás"
+                , db.lastError().text());
+        }
     }
 }
 

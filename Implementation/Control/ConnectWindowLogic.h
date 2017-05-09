@@ -14,7 +14,7 @@ class ConnectWindowLogic
 {
 public:
     QString buildConnectionName(const QString& fname) const noexcept;
-    void deleteConnection(QListWidgetItem* item);
+    bool deleteConnection(QListWidgetItem* item);
     const QStringList createList() const;
     void save (const QString& connectionName
                , const std::map<QString, QLineEdit*>& textFields

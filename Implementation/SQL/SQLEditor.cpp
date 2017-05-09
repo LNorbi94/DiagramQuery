@@ -101,10 +101,12 @@ void SqlEditor::load(const QString &filename)
         fName = QFileDialog::getOpenFileName(this);
 
     QFile file(fName);
-    file.open(QFile::ReadOnly | QFile::Text);
-    QTextStream readF(&file);
-    readF.setAutoDetectUnicode(true);
-    setText(readF.readAll());
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream readF(&file);
+        readF.setAutoDetectUnicode(true);
+        setText(readF.readAll());
+    }
 }
 
 bool SqlEditor::makeChart(QString& message
@@ -157,6 +159,7 @@ bool SqlEditor::makeChart(QString& message
 
     if ("PIECHART" == chart_type && executed)
     {
+        bool negative = false;
         q->previous();
         QPieSeries* series = new QPieSeries();
 
@@ -176,13 +179,25 @@ bool SqlEditor::makeChart(QString& message
             QString label = QString("%1 ( %2 % )").arg(pair.first)
                     .arg(percent, 0, 'f', 1, 0);
             series->append(label, pair.second);
+            if (pair.second < 0)
+            {
+                negative = true;
+                message = "Kérem kördiagramot csak pozitív számokkal használjon!";
+            }
         }
 
-        chart->addSeries(series);
-        chart->legend()->setAlignment(Qt::AlignLeft);
+        if (!negative)
+        {
+            chart->addSeries(series);
+            chart->legend()->setAlignment(Qt::AlignLeft);
 
-        executed = queryCount <= 20;
-        tooMany = !executed;
+            executed = queryCount <= 20;
+            tooMany = !executed;
+        }
+        else
+        {
+            executed = !negative;
+        }
     } else if ("BARCHART" == chart_type && executed)
     {
         q->previous();
@@ -209,8 +224,11 @@ bool SqlEditor::makeChart(QString& message
             message = "Nem támogatott diagram típus: " + chart_type;
     }
 
-    notEnough = queryCount <= 1;
-    executed = !notEnough && !tooMany;
+    if (message.isEmpty())
+    {
+        notEnough = queryCount <= 1;
+        executed = !notEnough && !tooMany;
+    }
 
     if (executed)
     {
@@ -223,7 +241,7 @@ bool SqlEditor::makeChart(QString& message
     else if (message.isEmpty())
     {
         if (tooMany)
-            message = "Kérem ezt a diagramtípust kevesebb adattal használja.";
+            message = "Kérem ezt a diagramtípust kevesebb rekorddal használja.";
         else if (notEnough)
             message = "Üres lekérdezés.";
     }

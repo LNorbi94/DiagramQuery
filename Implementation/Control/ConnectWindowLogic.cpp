@@ -9,7 +9,7 @@ QString ConnectWindowLogic::buildConnectionName(const QString &fname) const noex
     return filename;
 }
 
-void ConnectWindowLogic::deleteConnection(QListWidgetItem* item)
+bool ConnectWindowLogic::deleteConnection(QListWidgetItem* item)
 {
     const QString filename = buildConnectionName(item->text());
     QFile file(filename);
@@ -17,7 +17,10 @@ void ConnectWindowLogic::deleteConnection(QListWidgetItem* item)
     if (Q_LIKELY(file.remove()))
     {
         delete item;
+        return true;
     }
+
+    return false;
 }
 
 const QStringList ConnectWindowLogic::createList() const
@@ -61,6 +64,11 @@ void ConnectWindowLogic::save(const QString& connectionName
 void ConnectWindowLogic::load(std::map<QString, QLineEdit *>& textFields
                                , const QString& connectionName) const
 {
+    for (auto& textField : textFields)
+    {
+        textField.second->setText("");
+    }
+
     const QString filename = buildConnectionName(connectionName);
     QFile file(filename);
     auto tr = [] (const char* stringToConvert)

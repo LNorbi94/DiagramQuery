@@ -113,8 +113,17 @@ void ConnectWindow::deleteConnection() noexcept
                                   , confirmDel.arg(toDelete)
                                   , this);
 
+    bool success = false;
     if (confirmDelete)
-        logic.deleteConnection(connectionList->currentItem());
+        success = logic.deleteConnection(connectionList->currentItem());
+
+    if (!success)
+    {
+        QMessageBox::warning(
+            this
+            , "Kapcsolat törlése"
+            , "Kapcsolat törlése sikertelen!");
+    }
 }
 
 void ConnectWindow::fillConnectionList() noexcept

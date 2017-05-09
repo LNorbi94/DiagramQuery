@@ -145,6 +145,7 @@ QTreeWidget* MainWindowLogic::createExecutionPlan(const int width)
         bool success = q->exec(explainPlan);
         if (!success)
         {
+            failMessage = "Kérem hozza létre a PLAN_TABLE táblát ezen parancs használata előtt!";
             return success;
         }
         success = q->exec("SELECT cardinality, \
