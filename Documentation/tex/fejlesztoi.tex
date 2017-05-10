@@ -4,8 +4,8 @@ Egy integrált fejlesztői környezetnél többféle igény is megfogalmazható.
 olyanra van szüksége, amely ugyan kevesebbet tud, de gyorsabban indítható, esetlegesen gyorsabban
 végezhető vele a munka. SQL-hez található több integrált fejlesztői környezet, ilyen az Oracle-nél
 például az SQL Developer\cite{sqldeveloper}.
-Az én programom az SQL Developerhez képest kevesebb komponenst tartalmaz, így gyorsabb is. Tökéletes
-eszköz, ha valaki csak a lekérdezésekre próbál koncentrálni.
+Az én programom az SQL Developerhez képest kevesebb komponenst tartalmaz, valamint nem Javaban, hanem C++ban lett írva,
+így gyorsabb is. Tökéletes eszköz, ha valaki csak a lekérdezésekre próbál koncentrálni.
 
 A megvalósított programban lehetőség van...
 \begin{itemize}
@@ -22,7 +22,7 @@ A megvalósított programban lehetőség van...
 A fejlesztéshez szükséges eszközök kiválasztásnál tehát szempont volt a hatékonyság, valamint hogy
 ennek ellenére többet nyújtson az eddig elérhető programoknál, ezért esett a választásom a Qt-ra, ami egy C++ keretrendszer.
 Nem csak hatékony kódot lehet vele készíteni, szükség esetén magas absztrakció is használható, és nem
-csak egy operáció rendszeren fordítható a Qt-ban készített programok. Ezen felül elvárás hogy legyen intuitív kezelőfelülete,
+csak egy operációs rendszeren lehet a Qt-ban készített programokat futtatni. Ezen felül elvárás hogy legyen intuitív kezelőfelülete,
 és biztonságosan működjön.
 
 \section{Fogalmak}
@@ -46,7 +46,7 @@ Felhasználóknak ezen felül lehetősége nyílhat más funkciók használatár
 ám ezek a legfontosabbak, így ezeknek az implementálása az elsődleges.
 Ezeknek az implementálása két külön ablakban történt a gyorsabb elérhetőség, és
 a modularitás miatt: így bármikor lehetőség nyílik új ablak nyitására, esetleg
-ha valaki akar felhasználhatja a programot és kódbol csatlakozhat az adatbázishoz.
+ha valaki akar felhasználhatja a programot, és kódbol csatlakozhat az adatbázishoz.
 Biztonsági szempontból ez nem ajánlatos, de ez is egy lehetőség ha nincs a számítógépen
 biztonsági kockázat (pl. belső hálózatról működik csak, illetéktelen felhasználó nem férhet hozzá).
 
@@ -77,9 +77,9 @@ történik, akkor azt jelezze a program ennek megfelelően. Kapcsolat törlése 
 A kapcsolódás után fogadja a felhasználókat a fő ablak. Legfontosabb itt, hogy a felhasználó rögtön munkához tudjon látni.
 Érdemes úgy készíteni, hogy a képernyő nagy részét a szerkesztő tegye ki. Bal oldalon egy fában jelenjenek meg az adatbázis objektumai
 (táblák, nézetek, függvények, indexek) és lehessen megtekinteni illetve törölni őket. A képernyőn jelenjen meg egy logban a futási idő,
-illetve ha hiba történik az legyen szemmel látható. PL/SQL szkriptek miatt érdemes egy külön lapon megjeleníteni a kiírt üzeneteket is.
-Azonkívül legyen lehetőség a szerkesztő törlésére, mentésére, valamint már meglévő *.sql fájl betöltésére is. A program adjon figyelmeztetést
-törlés esetén. Mindemelett lehessen újra kapcsolódni az adatbázishoz arra az esetre ha megszakadna a kapcsolat az adatbázissal, valamint
+illetve ha hiba történik, az legyen szemmel látható. PL/SQL szkriptek miatt érdemes egy külön lapon megjeleníteni a kiírt üzeneteket is.
+Azonkívül legyen lehetőség a szerkesztő törlésére, mentésére, valamint már meglévő .sql kiterjesztésű fájl betöltésére is. A program adjon figyelmeztetést
+törlés esetén. Mindemelett lehessen újra kapcsolódni az adatbázishoz arra az esetre, ha megszakadna a kapcsolat az adatbázissal, valamint
 lehessen új kapcsolatot is nyitni, ami zárja be a jelenlegit. Legyen lehetőség az adatbázis objektumok megtekintésére és törlésére is.
 A szerkesztőablakba beírt SQL lekérdezések, PL/SQL szkriptek, illetve egyedi parancsok (diagramok készítésére) hajtódjanak végre megfelelően,
 és legyen látható pontosan mit hajtott végre a program. A szerkesztő betűtípusa legyen jól olvasható, a tabulátor mérete alapértelmezetten legyen
@@ -97,7 +97,7 @@ A szerkesztőablakba beírt SQL lekérdezések, PL/SQL szkriptek, illetve egyedi
 A program négy fő komponensből áll: Control, View, SQL, Tools. Mindegyik komponense a programnak külön felhasználható,
 valamint bővíthetőek. Az SQL komponens azonban főként Oracle SQL-hez lett írva, így nem feltétlen működik minden
 SQL variánsal, de ez később bővíthető. Az osztályokon kívűl egyéb függvényeket is tartalmaznak ezen komponensek, valamint
-konstansokat is: ezek a jobb érthetőség és átláthatóság miatt kerültek legfőképp a programba.
+konstansokat is: ezek a jobb érthetőség és átláthatóság miatt kerültek a programba.
 
 \subsubsection{Control}
 
@@ -133,7 +133,7 @@ felhasználó adatai úgy mint a neve és jelszava. A függvény írja ki ha hib
 
 A MainWindow::reconnect() metódus felelős a kapcsolat újboli kiépítésére. Bemenő adatai a felhasználó neve és jelszava. Abban az esetben ha a felhasználó
 hibás adatokat ad meg, természetesen nem dobja el a régi kapcsolatot, hanem értesíti a felhasználót a hibáról. Megfelelő adatok esetén belépteti a felhasználót,
-és az folytathatja tovább eddigi munkáját. Erre legfőképp azért lehet szükség, mert bizonyos adatbázis szerverek (pl. Oracle) egy idő után kidobják a felhasználót.
+és folytathatja tovább eddigi munkáját. Erre legfőképp azért lehet szükség, mert bizonyos adatbázis szerverek (pl. Oracle) egy idő után kidobják a felhasználót.
 Ilyenkor az egész programot újra kéne indítani ha erre nem adnánk lehetőséget.
 
 \subsubsection{SQL}
@@ -146,7 +146,7 @@ Ilyenkor az egész programot újra kéne indítani ha erre nem adnánk lehetős�
 \end{figure}
 
 Az SQL komponens végzi el a nyelvhez kapcsolódó feladatokat: szerkesztőfelülelet kialakítása, szintaxis kiemelése, a lekérdezések és szkriptek
-megfelelő kiszedése. A cél az hogy akár önmagában is használható legyen (feltéve ha van egy adatbázis biztosítva hozzá), és minden SQL művelet
+megfelelő kiszedése. A cél az, hogy akár önmagában is használható legyen (feltéve, ha van egy adatbázis biztosítva hozzá), és minden SQL művelet
 elvégezhető legyen a segítségével.
 
 SQLHighlighter osztály reguláris nyelvtannal végzi el a kapott szöveg elemzését. Az összes SQL és PL/SQL kulcsszavak\cite{sqlwords} kiemelését
@@ -156,13 +156,13 @@ majd reguláris kifejezések segítségével kiemeli a kulcsszavakat, és liter�
 
 ServerOutput osztály a DBMS\_OUTPUT kiírására szolgál. Egy temporáris táblába tárolja el a kiírt sorokat amit a bufferből olvas, majd ezt kérésre
 kiírja, és törli. Külön osztály azért szükséges ehhez, hogy kilépés esetén törölje maga után a létrehozott temporáris objektumokat a program a
-RAII elvei szerint. Egyetlen fontos metódusa a \textit{writeOutput()} aminek nincs bemenete és kimenete, csupán kiírja a megfelelő helyre a
+RAII elvei szerint. Egyetlen fontos metódusa a \textit{writeOutput()}, aminek nincs bemenete és kimenete, csupán kiírja a megfelelő helyre a
 buffer tartalmát.
 
-Az SQLEditor osztály valósítja meg a fő szerkesztő felületét az osztálynak. Ezen felül ez az osztály hozza létre a diagramokat, és kezeli le az
+Az SQLEditor osztály valósítja meg a fő szerkesztőfelületét az osztálynak. Ezen felül ez az osztály hozza létre a diagramokat, és kezeli le az
 esetlegesen hibás bemeneteket. A szerkesztéssel kapcsolatos logika is itt található: itt történik a végrehajtandó utasítások kiemelése (persze a
 végrehajtásuk nem ebben az osztályban történik), a diagramok feldolgozása és kirajzolása, valamint a lapok mentése és betöltése is. Annak érdekében
-hogy jobban hasonlítson eegy szerkesztőhöz, a jelenleg aktív sorokat is kiemeli, valamint ha futtatunk egy utasítást, vagy utasításokat, akkor azokat
+hogy jobban hasonlítson egy szerkesztőhöz, a jelenleg aktív sorokat is kiemeli, valamint ha futtatunk egy utasítást, vagy utasításokat, akkor azokat
 is kiemeli hogy a felhasználó tisztában legyen azzal, hogy a program mit hajtott végre.
 
 \subsubsection{Tools}
@@ -174,7 +174,13 @@ is kiemeli hogy a felhasználó tisztában legyen azzal, hogy a program mit hajt
  \caption{Tools komponens osztályának diagramja}
 \end{figure}
 
+Ebben a komponensben a két osztályon felül egyéb eljárások illetve konstansok kerülnek eltárolásra.
 
+A DBLogger osztály fontos szerepet játszik, mivel annak segítségével fogjuk a végrehajtandó utasításokat végrehajtani, és így lemérni a futás
+idejüket. SQL lekérdezések készítésénél kritikus ennek a megléte, mivel így tudja a felhasználó javítani a lekérdezéseit szükség esetén.
+\textit{DBLogger::logWithTime} metódusa fogja megoldani ezt, mégpedig egy függvény pointer segítségével. Szükséges bemenete a függvény amit
+a programban kivánunk futtatni, és visszaad egy üzenetet arról hogy a művelet sikeres avagy sikertelen volt-e, valamint egy hibaüzenetet
+sikertelen lefutás esetén.
 
 \section{Megvalósítás}
 \subsection{Eszközválasztás}
