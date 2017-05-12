@@ -184,7 +184,25 @@ sikertelen lefutás esetén.
 
 \section{Megvalósítás}
 \subsection{Eszközválasztás}
+
+\subsection{Control}
+
+\subsubsection{ConnectWindowLogic}
+
+\textit{Függvények}
+
+\textbf{buildConnectionName(QString\&)}: Felépíti a kapcsolat nevét, azaz az átadott QString nevével létrehoz egy
+Connections/$<$string neve$>$.xml tartalmú QStringet majd visszaadja azt. A függvényben a QDir::separator() elválasztót
+használjuk, így rendszerfüggetlen elválasztót kapva.
+
+\textbf{deleteConnection(QListWidgetItem*)}: A fentebb említett függvény segítségével megépíti a kapcsolat nevét
+ahhoz az elemhez amit paraméterként kap. Ha sikerül a törlés akkor törli az elemet is, és igazat ad vissza, különben hamisat.
+Itt megemlíteném az elágazásban használt makrót: Q\_LIKELY. Qt saját makrója, ami segít a branch predictingben, így
+hatékonyabb kódot generálva.
+
 \subsection{SQL eszközök}
+
+
 \subsection{Felhasználói felület}
 \subsection{Fejlesztői környezet}
 

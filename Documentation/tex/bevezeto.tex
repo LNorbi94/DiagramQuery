@@ -13,7 +13,8 @@ egyik mód egy integrált fejlesztői környezet használata, ami kényelmes
 felületet biztosít a tanuláshoz, többek között a szintaxis kiemelésnek,
 illetve a könnyen szerkeszthető, és futtatható lekérdezések segítségével.
 
-Azt is megemlíteném, hogy mire jó az Oracle SQL: maga a nyelv mögötti szerver képes biztonságosan tárolni nagy
+Felmerülhet a kérdés, hogy pontosan mire is jó az SQL?
+Az SQL, azon belül is az Oracle SQL nyelv mögötti szerver képes biztonságosan tárolni nagy
 mennyiségű adatokat, hiba esetén helyreállítani azokat, illetve lehetőség van a különböző adattáblák indexelésére
 ami felgyorsíthatja a lekérdezéseket, de ezen kívül számos pozitív (és persze negatív) tulajdonsága is van,
 ami jelenlegi program szempontjából nem annyira lényeges. Felmerülhet az igény, hogy ezeket az adatmennyiségeket
@@ -21,8 +22,8 @@ ami jelenlegi program szempontjából nem annyira lényeges. Felmerülhet az ig�
 Erre szolgál az ebben a programban létrehozható diagramok: ha megfelelően lekérdezzük az adatokat jól látható
 eredményeket kapunk, amik segíthetnek bizonyos szolgáltatások fejlesztésében.
 
-A szerkesztőfelületnek köszönhetően ha hibát ejt a felhasználó azt könnyen
-javíthatja, valamint elmentheti munkáját, illetve betölthet korábban létrehozott
+A szerkesztőfelületnek köszönhetően ha hiba történik az könnyen
+javítható, valamint elmentheti munkáját, betölthet korábban létrehozott
 SQL fájlokat is. A szintaxis kiemelésnek köszönhetően könnyű észrevenni,
 és javítani a hibákat, sőt lényegesen gyorsabban meg lehet tanulni az SQL
 nyelvet. Bizonyos műveleteket akár az SQL teljes ismerete nélkül is elvégezhet bárki:
@@ -32,7 +33,7 @@ Továbbá tapasztalt felhasználóknak is hasznos eszköz, könnyebben tudnak SQ
 lekérdezéseket, illetve szkripteket készíteni, és futtatni. Emellett képes megjeleníteni
 SQL lekérdezéseknek a lekérdezési tervét.
 
-Mindezen funkciók megvalósítása volt a célom a program írása közben. Mivel az
+Mindezen funkciók megvalósítása volt a cél a program írása közben. Mivel az
 implementáció Qt keretrendszer segítségével történt, így könnyen bővíthető a program további adatbázis szerverek
 használatával, azonban a program csak Oracle SQL adatbázis szerverhez képes csatlakozni.
 A programra \textit{DiagramQuery} néven fogok a továbbiakban hivatkozni.

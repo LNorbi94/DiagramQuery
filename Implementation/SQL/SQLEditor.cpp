@@ -216,6 +216,8 @@ bool SqlEditor::makeChart(QString& message
         chart->addSeries(series);
         chart->legend()->setAlignment(Qt::AlignBottom);
 
+        chart->createDefaultAxes();
+
         executed = queryCount <= 10;
         tooMany = !executed;
     } else
