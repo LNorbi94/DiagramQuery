@@ -71,33 +71,39 @@ void ConnectWindowLogic::load(std::map<QString, QLineEdit *>& textFields
 
     const QString filename = buildConnectionName(connectionName);
     QFile file(filename);
-    auto tr = [] (const char* stringToConvert)
-    { return QString(stringToConvert); };
 
     if (Q_LIKELY(file.open(QIODevice::ReadOnly)))
     {
+        QStringRef tagname;
+        QStringRef text;
         QXmlStreamReader xmlReader;
         xmlReader.setDevice(&file);
         while (!xmlReader.atEnd())
         {
             if (xmlReader.isStartElement())
             {
-                QStringRef tagname = xmlReader.name();
+                tagname = xmlReader.name();
                 xmlReader.readNext();
-                QStringRef text = xmlReader.text();
-                if (0 == tagname.compare(tr("port")))
+                text = xmlReader.text();
+                if ("port" == tagname)
                 {
-                    textFields["port"]->setText(text.toString());
+                    QIntValidator validator(0, 10000);
+                    int pos = 0;
+                    QString plainText = text.toString();
+                    QValidator::State state = validator.validate(plainText
+                                                                 , pos);
+                    if (state == QValidator::Acceptable)
+                        textFields["port"]->setText(text.toString());
                 }
-                else if (0 == tagname.compare(tr("host")))
+                else if ("host" == tagname)
                 {
                     textFields["host"]->setText(text.toString());
                 }
-                else if (0 == tagname.compare(tr("username")))
+                else if ("username" == tagname)
                 {
                     textFields["username"]->setText(text.toString());
                 }
-                else if (0 == tagname.compare(tr("service")))
+                else if ("service" == tagname)
                 {
                     textFields["service"]->setText(text.toString());
                 }

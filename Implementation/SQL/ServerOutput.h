@@ -7,6 +7,7 @@
 #include <QTime>
 
 #include <QPlainTextEdit>
+#include <QTabWidget>
 
 class ServerOutput
 {
@@ -14,14 +15,21 @@ public:
     ServerOutput(QSqlDatabase* db, QPlainTextEdit* dbmsOutput);
     ~ServerOutput();
 
-    void writeOutput();
+    bool writeOutput();
     void prepareWrite()
-    { db->exec(QString("CREATE TABLE %1 (line varchar2(100))").arg(tableName)); }
+    {
+        db->exec("BEGIN \
+                  DBMS_OUTPUT.ENABLE (buffer_size => NULL); \
+                END;");
+        db->exec(QString("CREATE TABLE %1 (line varchar2(100))").arg(tableName));
+    }
     void clean()
     {
         db->exec(QString("DELETE FROM %1").arg(tableName));
         db->exec(QString("DROP TABLE %1").arg(tableName));
     }
+    QPlainTextEdit* getOutput()
+    { return dbmsOutput; }
 
 private:
     QSqlDatabase* db;

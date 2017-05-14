@@ -19,6 +19,7 @@
 #include <QPieSlice>
 #include <QBarSeries>
 #include <QBarSet>
+#include <QBarCategoryAxis>
 
 class SqlEditor : public QTextEdit
 {

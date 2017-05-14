@@ -258,7 +258,10 @@ void MainWindow::executeString(const QString& query)
 {
     serverOutput->prepareWrite();
     logic->executeString(query, editor);
-    serverOutput->writeOutput();
+    bool wrote = serverOutput->writeOutput();
+
+    if (wrote)
+        boxes->setCurrentWidget(serverOutput->getOutput());
 }
 
 void MainWindow::deleteDbObject()
@@ -356,7 +359,6 @@ void MainWindow::reconnect()
         password->setText("");
         if (db.isOpen())
         {
-
             QMessageBox::information(
                 this
                 , "Kapcsolódva"

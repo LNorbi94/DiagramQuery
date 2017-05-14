@@ -1,33 +1,32 @@
 \chapter{Felhasználói dokumentáció}
-A \textit{DiagramQuery} első sorban lehetőséget biztosít egy Oracle SQL adatbázishoz való kapcsolódáshoz, illetve
-eme adatbázison lekérdezések, szkriptek végrehajtására, továbbá diagramok létrehozására ezen lekérdezések
-segítségével.
-A kapcsolatokat tartalmazó adatokat el is lehet menteni (valamint lehetőség van kézzel leírni,
-ez kifejtésre kerül az első szekcióban.), illetve betölteni egy .xml formátumú fájlból.
+A \textit{QueryCreator} első sorban lehetőséget biztosít egy Oracle SQL adatbázishoz való kapcsolódáshoz, illetve
+az adatbázison lekérdezések, szkriptek végrehajtására, továbbá diagramok létrehozására lekérdezések segítségével.
+A kapcsolatokat tartalmazó adatokat el is lehet menteni (valamint lehetőség van manuálisan létrehozni egy, a kapcsolat adatait leíró fájlt létrehozni,
+ez kifejtésre kerül a 2.1-es szakaszban.), illetve betölteni egy xml formátumú fájlból.
 
 A kapcsolat felépítése után juthatunk a fő ablakba, itt lehetőség van a fentebb említett SQL lekérdezések végrehajtására, 
 azonkívül PL/SQL szkriptek futtatására,
-illetve diagramokat is itt lehet készíteni, ennek részletezése a 2.3.-ban történik meg.
+illetve diagramokat is itt lehet készíteni, ennek részletezése a 2.3-as szakaszban történik meg.
 
 \section{Telepítés és beállítás}
-A \textit{DiagramQuery} telepítése nem szükséges, ám a lemezen található minden állomány szükséges a futásához,
-így futtatáshoz másoljon át minden fájlt, és futtassa a \textit{DiagramQuery.exe}-t.
-Windows 10 alatt lett tesztelve, a program bármilyen rendszeren képes megfelelően működni ahol a
-Windows 10 is elfut alkalmas módon.
+A \textit{QueryCreator} telepítése nem szükséges, azonban a lemezen található QueryCreator mappából minden állomány szükséges a futásához,
+így az indításához másoljon át minden fájlt, és futtassa a mappában található \textit{QueryCreator.exe}-t.
+A program bármilyen rendszeren képes megfelelően működni ahol a
+Windows 10 elfut alkalmas módon, ezen operációs rendszeren tesztelve is lett a program.
 
-Érdemes megjegyezni, hogy a DiagramQuery Qt keretrendszerben lett megírva. Ez azt jelenti, hogy nem csak Windowson lehet
-futtatni fordítás után, hanem bármin amin Qt és OCI elérhető. Linuxon is tesztelve lett, és helyesen működik. A program telepítése
+Érdemes megjegyezni, hogy a QueryCreator Qt keretrendszerben lett megírva. Ez azt jelenti, hogy nem csak Windowson lehet
+futtatni fordítás után, hanem bármin amin ez a keretrendszer és az Oracle Instant Client (OCI) elérhető. Linuxon is tesztelve lett. A program telepítése
 forráskódból:
 \begin{enumerate}
   \item Qt 5.6, vagy frissebb letöltése és telepítése.
-  \item Oracle Instant Client letöltése, valamint telepítése (Oracle oldalán elérhető, regisztrációhoz kötött).
+  \item OCI letöltése, valamint telepítése (Oracle oldalán elérhető, regisztrációhoz kötött).
   \item Qt OCI pluginjának fordítása.
   \item Utolsó lépésként egyszerűen fordítható a program, immáron működőképes kell legyen.
 \end{enumerate}
 
 Lehetőség van későbbi fejlesztések során további adatbázis-kezelők hozzáadására a forráskód birtokában, azonban ekkor
 manuálisan kell telepíteni az előbb leírtak szerint.
-Telepítés után lehetőség van manuálisan létrehozni kapcsolatokat. Ha ezt kívánja tenni, akkor hozzon létre egy
+Telepítés után lehetőség van saját igény szerint létrehozni kapcsolatokat. Ha ezt kívánja tenni, akkor hozzon létre egy
 \textit{Connections} mappát a futtatható állomány könyvtárába, és hozzon létre egy .xml kiterjesztésű fájlt a kívánt névvel.
 
 Egy példa a fájlra:
@@ -45,13 +44,14 @@ Egy példa a fájlra:
 A fájl felépítése a következő legyen:
 \begin{itemize}
   \item A második (és hetedik) sorhoz hasonlóan \textbf{Connection} címkék között legyen elhelyezve az egész kód, illetve legyen a
-  nyitócímkének egy attribútuma: name, a kapcsolat nevével,
-  \item \textbf{host} címkék között a kapcsolat címe legyen a harmadik sorban látható módon,
-  \item \textbf{port} címkék között legyen megadva a kapcsolat portja úgy, ahogy a negyedik sorban látható,
-  \item \textbf{service} címkék között legyen a szerviz neve az ötödik sorhoz hasonlóan,
+  nyitócímkének egy attribútuma: name, a kapcsolat nevével.
+  \item \textbf{host} címkék között a kapcsolat címe legyen a harmadik sorban látható módon.
+  \item \textbf{port} címkék között legyen megadva a kapcsolat portja úgy, ahogy a negyedik sorban látható, valamint csak és kizárólag 0 és 10000 közötti számot adjunk meg, különben a
+  port nem kerül beolvasásra.
+  \item \textbf{service} címkék között legyen a szervíz neve az ötödik sorhoz hasonlóan.
   \item illetve \textbf{username} címkék között a bejelentkezéshez szükséges felhasználónév ugyanúgy mint a hatodik sorban.
 \end{itemize}
-Ha valamelyik mezőt nem szeretné eltárolni, akkor azt címkével együtt hagyja ki.
+Ha valamelyik mezőt nem szeretné eltárolni, akkor azt címkével együtt hagyja ki, ez a program futását nem befolyásolja.
 
 Miután létrehoztuk a fájlt, utána el is kezdhetjük a program használatát, további beállításra nincs szükség.
 \begin{figure}[ht]
@@ -64,12 +64,12 @@ A mentett kapcsolatok kezelésére itt is lehetőség van.
 Duplán kattintva egy kapcsolat nevére betölthetjük annak adatait. Ha valamelyik mező üresen lett hagyva,
 akkor az ablakban levő mező is üres lesz. (Abban az esetben is, ha korábban lett bele írva.)
 A \textit{delete} billentyű lenyomására a kijelölt kapcsolat törlődik, de
-mielőtt véglegesen törölné a program kér egy megerősítést a felhasználótól.
+mielőtt véglegesen törölné, a program kér egy megerősítést a felhasználótól.
 Lehetőség van az aktuális, képernyőn látható kapcsolati adatok mentésére is. Ekkor egy nevet kell megadni a kapcsolatnak, ami nem lehet üres,
 valamint két különböző kapcsolat nem szerepelhet ugyanazon névvel, ennek ellenére felül lehet írni jelenleg létező kapcsolatot ha módosítani
 kívánjuk.
 Az adatok helyes megadása után, illetve ha létrejön sikeresen a kapcsolat az adatbázissal, akkor a program beléptet a fő ablakhoz.
-Hiba esetén kiírja a hibakódot, ezekről részletesebben 2.3-as szakaszban olvashat.
+Hiba esetén kiírja a hibakódot, ezekről részletesebben a 2.3-as szakaszban olvashat.
 
 \section{A kapcsolódási ablaknál előforduló hibák}
 
@@ -80,15 +80,15 @@ Hiba esetén kiírja a hibakódot, ezekről részletesebben 2.3-as szakaszban ol
  \caption{Kapcsolódási hibára példa}
 \end{figure}
 
-Kapcsolódás közben több hiba is előfordulhat, csakhogy ezeket az adatbázis szerver kezeli, nem a DiagramQuery.
+Kapcsolódás közben több hiba is előfordulhat, csakhogy ezeket az adatbázis szerver kezeli, nem a QueryCreator.
 Néhány gyakori hibát megemlítenék, ami hasznos lehet
 a program első használata során. A következő hibakódok fordulhatnak elő a leggyakrabban:
 \begin{itemize}
-  \item \textbf{ORA-12560}: TNS:protocol adapter error; Unable to logon. Ezt okozhatja internetkapcsolat hiánya,
+  \item \textbf{ORA-12560: TNS:protocol adapter error; Unable to logon.} Ezt okozhatja internetkapcsolat hiánya,
   vagy hiányzó szervernév, azaz ha nem lehet kiépíteni kapcsolatot a szerverrel bármilyen okból.
-  \item \textbf{ORA-01005}: null password given; logon denied; Unable to logon. Ezt a hibaüzenetet akkor fogja kapni,
+  \item \textbf{ORA-01005: null password given; logon denied; Unable to logon.} Ezt a hibaüzenetet akkor fogja kapni,
   ha a jelszó mezőt üresen hagyja. (Ha üres a jelszó mező akkor hibás felhasználónév esetén is ez a hibaüzenet jön elő)
-  \item \textbf{ORA-01017}: invalid username/password; logon denied; Unable to logon. Hibás felhasználónév vagy jelszó 
+  \item \textbf{ORA-01017: invalid username/password; logon denied; Unable to logon.} Hibás felhasználónév vagy jelszó 
   esetén jelenik meg ez a hibaüzenet.
 \end{itemize}
 
@@ -97,8 +97,8 @@ kapcsolattal, akkor kérjen meg egy hozzáértőt a probléma elhárításában 
 magával az adatbázis szerverrel van probléma).
 
 Az Oracle Docs\cite{oracledocs} oldalán megtalálható minden hibakód, és a hibák okai (angolul).
-Legtöbb esetben elég beszédesek, így meg lehet őket érteni dokumentáció nélkül is, valamint ha magyar nyelvű
-\textit{Oracle Instantclient}-et tölt le, abban az esetben magyarul jelennek meg a hibaüzenetek magyarázatai.
+Legtöbb esetben egyértelműek, így meg lehet őket érteni dokumentáció nélkül is, valamint ha magyar nyelvű
+\textit{Oracle Instant Client}-et tölt le, abban az esetben magyarul jelennek meg a hibaüzenetek magyarázatai.
 A későbbiekben is ezen hibakódok vannak használva (és logolva), így ezt az oldalt érdemes a későbbiekben is látogatni.
 
 A továbbiakban a kapcsolódási ablak saját hibaüzeneteit részletezném:
@@ -106,11 +106,12 @@ A továbbiakban a kapcsolódási ablak saját hibaüzeneteit részletezném:
   \item \textbf{Kapcsolat törlése sikertelen!}: Ez akkor fordulhat elő, ha nincs joga ahhoz a fájlhoz ami
   ezt a kapcsolatot tartalmazza, vagy abban az esetben ha futás közben már törölve lett.
   \item \textbf{Kérem ellenőrizze jogosultságát a program könyvtárához.}: A program a Connections nevű mappát
-  próbálja létrehozni abban az esetben, ha nem létezik, és ez a hibaüzenet fog megjelenni akkor, ha ez a kísérlet meghiúsul.
+  próbálja létrehozni, és ez a hibaüzenet fog megjelenni akkor, ha ez a kísérlet meghiúsul.
   \item \textbf{Kérem adjon meg egy nevet, amivel később majd el lehet érni a kapcsolatot!}: akkor jelenik meg, hogyha üres
   szöveget próbált megadni a kapcsolat nevének.
   \item \textbf{Fájl megnyitása sikertelen!}: akkor jelenik meg, ha mentés közben a program nem fér hozzá a
-  Connections/\textbf{$<$kapcsolatneve$>$}.xml fájlhoz.
+  Connections/\textbf{$<$kapcsolatneve$>$}.xml fájlhoz. Továbbá ez a hibaüzenet jelenik meg, ha az operációs rendszer sajátosságai miatt
+  sikertelen a kapcsolat létrehozása.
 \end{itemize}
 
 \newpage
@@ -123,8 +124,8 @@ A továbbiakban a kapcsolódási ablak saját hibaüzeneteit részletezném:
 Sikeres belépés esetén egy ehhez hasonló képernyő fogadja a felhasználókat.
 A következő billentyűparancsok használhatóak az ablakon belül:
 \begin{itemize}
-  \item \textbf{CTRL+W, illetve CTRL+SHIFT+W}: bezárja alsó, illetve felső lapot. Az alapértelmezett lapokat nem lehet bezárni.
-  \item \textbf{CTRL+ENTER}: A szerkesztőben lévő lekérdezést vagy szkriptet végrehajtja kurzor helyzetétől függően.
+  \item \textbf{CTRL+W, illetve CTRL+SHIFT+W}: bezárja az alsó, illetve felső dobozban található, aktuálisan aktív lapot. Az alapértelmezett lapokat ($<$adatbázis neve$>$, Adatbázis log, DBMS Output) nem lehet bezárni.
+  \item \textbf{CTRL+ENTER}: A szerkesztőben lévő lekérdezést, vagy szkriptet végrehajtja kurzor helyzetétől függően.
   \item \textbf{F4}: Lekérdezési terv létrehozása.
   \item \textbf{F3}: Kijelölt utasítás(ok) végrehajtása.
   \item \textbf{DELETE}: Adatbázis objektum törlése a bal oldali fából.
@@ -134,17 +135,16 @@ Ezeket a parancsokat nem csak billentyűkombinációk révén lehet elérni, han
 
 A menüben lévő parancsokról röviden:
 \begin{itemize}
-  \item \textbf{Fájl $\rightarrow$ Új} - Új lapot hoz létre a program, azaz töröl minden szöveget a jelenlegi szerkesztőből. Mielőtt ezt megtenné,
-természetesen figyelmezteti erről a felhasználót. CTRL + N billentyűkombinációval is elérhető.
+  \item \textbf{Fájl $\rightarrow$ Új} - Új lapot hoz létre a program, azaz töröl minden szöveget a jelenlegi szerkesztőből. Mielőtt ezt megtenné, figyelmezteti erről a felhasználót. CTRL + N billentyűkombinációval is elérhető.
   \item \textbf{Fájl $\rightarrow$ Megnyitás...} - Törli a jelenlegi lap tartalmát és betölti a kiválasztott fájlt. Hiba vagy visszalépés esetén
   megmarad a korábban írt lap tartalma. CTRL + O billentyűkombinációval is elérhető.
   \item \textbf{Fájl $\rightarrow$ Mentés másként...} - Elmenti a jelenlegi lap tartalmát. Hiba esetén jelez, és nem történik mentés.
   CTRL + S billentyűkombinációval is elérhető.
   \item \textbf{Fájl $\rightarrow$ Kilépés} - Kilépés a programból. A nem mentett munka elveszik, a program nem figyelmeztet nem mentett tranzakciókról,
   se a szerkesztőbe írt, de nem mentett adatokról, azonban megerősítést kér, mielőtt kilép. CTRL + Q billentyűkombinációval is elérhető.
-  \item \textbf{Szerkesztés $\rightarrow$ Parancs futtatása} - Ugyan az a hatás érhető el vele, mint a \textit{CTRL+ENTER} billentyűkombinációval.
+  \item \textbf{Szerkesztés $\rightarrow$ Parancs futtatása} - Ugyan azt a funkciót lehet vele elérni, mint a \textit{CTRL+ENTER} billentyűkombinációval.
   \item \textbf{Szerkesztés $\rightarrow$ Kijelölés futtatása} - \textit{F3}-hoz hasonlóan végrehajta a kijelölt utasítást.
-  \item \textbf{Szerkesztés $\rightarrow$ Lekérdezési terv megjelenítése} - Nem különb a hatása, mint az \textit{F4} megnyomásának: a kurzor helyén lévő lekérdezéshez,
+  \item \textbf{Szerkesztés $\rightarrow$ Lekérdezési terv megjelenítése} - Hasonlóan az \textit{F4} gomb megnyomásához, ez a parancs is a kurzor helyén lévő lekérdezéshez,
   vagy a kijelölt lekérdezéshez készít lekérdezési tervet, majd jeleníti meg azt.
   \item \textbf{Adatbázis $\rightarrow$ Újrakapcsolódás...} - Megpróbál új kapcsolatot kiépíteni az adatbázis szerverrel. Az újrakapcsolódáshoz meg kell adnia ismét
   a jelszavát.
@@ -153,27 +153,28 @@ természetesen figyelmezteti erről a felhasználót. CTRL + N billentyűkombin�
   \item \textbf{Adatbázis objektumok $\rightarrow$ Törlés} - A jelenleg kijelölt adatbázis objektumot törli beleegyezés után.
 \end{itemize}
 
-Itt még egy dologra felhívnám a figyelmet: Ha időtúllépés miatt kiléptet az adatbázis (ezt az adatbázis szerver beállításaitól függ mennyi idő), akkor
+Itt még egy megjegyzést érdemes tenni: Ha időtúllépés miatt kiléptet az adatbázis (ez az adatbázis szerver beállításaitól függ mennyi idő), akkor
 érdemes az újrakapcsolódást választani, mivel ha lekérdezést próbál végrehajtani, akkor az adatbázis sokáig nem fog válaszolni.
 
 Az ablak bal oldalán található az adatbázis objektumok fája. Dupla kattintás esetén betöltődnek ezek az objektumok, majd ezután lehetőség nyílik ezek megtekintésére
 (dupla kattintás), illetve törlésére (\textit{delete} billentyű). Ismételt dupla kattintásra frissítésre kerülnek az adatok. Táblák megtekintése esetén előjön az
-attribútumainak neve, típusa, hossza, illetve hogy lehet-e az adott attribútum null. Indexeknél megtekinthető az index típusa, az hogy melyik táblához készült az index, illetve
+attribútumainak neve, típusa, hossza, illetve hogy lehet-e az adott attribútum értéke null. Indexeknél megtekinthető az index típusa, az hogy melyik táblához készült az index, illetve
 ennek a táblának a tulajdonosa, továbbá az hogy egyedi-e az index. Nézeteknél meg lehet nézni a lekérdezést amivel a nézet létre lett hozva, a nézet típusát, illetve
-hogy csak olvasható-e az adott nézet. Függvényeknél a függvény neve, id-ja, illetve létrehozási dátuma tekinthető meg. Ezt a fát igény esetén el is lehet tüntetni,
+hogy csak olvasható-e az adott nézet. Függvényeknél a függvény neve, azonosítója, illetve létrehozási dátuma tekinthető meg. Ezt a fát igény esetén el is lehet tüntetni,
 és akármikor vissza is lehet hozni. Ez hasznos lehet zavartalan íráshoz, vagy diagramok nagy méretben való megtekintésére.
 
-A jobb alsó sarokban találhatóak az Adatbázis logja illetve kimenete, ezen felül ide kerülnek a végrehajtott lekérdezések, és végrehajtási tervek is. Az adatbázis minden
+A jobb alsó sarokban találhatóak az adatbázis logja illetve kimenete, ezen felül ide kerülnek a végrehajtott lekérdezések, és végrehajtási tervek is. Az adatbázis minden
 sikertelen műveletet logol a hiba okával együtt, illetve a sikeres műveleteket is, a végrehajtáshoz szükséges idővel együtt. Ez a log (ha sikeresen létrehozható) megtalálható
-lesz később a háttértáron is, \textit{Logs} mappában \textit{ev\_honap\_nap.log} formában. Ha nem lépünk ki a programból a nap váltása előtt, akkor előző napi loghoz fog írni. Az adatbázis
+lesz később a háttértáron is, \textit{Logs} mappában \textit{ev\_honap\_nap.log} formában. Abban az esetben ha a program éjfél után is fut, akkor előző napi loghoz fog írni. Az adatbázis
 kimenete minden esetben működik, nincs szükség külön parancs beírására hogy megjelenítsük azt. Mindemellett ez a komponens is eltüntethető, abban az esetben ha a felhasználó számára éppen nem
 szükséges.
+\newpage
 
 \subsection{Lekérdezések}
 
 \begin{figure}[ht]
   \begin{center}
-  \includegraphics[max width=\textwidth]{expl_plan}
+  \includegraphics[scale=0.5]{expl_plan}
   \end{center}
  \caption{Lekérdezési terv megtekintése}
 \end{figure}
@@ -182,11 +183,11 @@ A program szerkesztő felületében lehetőség van SQL lekérdezések, illetve 
 nem működnek, így olyan utasításokat mint a \textbf{set serveroutput on} nem hajthatunk végre, csakhogy erre nincs is szükség, az adatbázis kimenet alapértelmezetten
 használható. A programban szintaxis kiemeléssel jelennek meg ezek az utasítások, így tanulás közben is használható. Azonban szemantikus elemzés és automatikus
 kitöltés nincsen a programban. Az SQL parancsokat érdemes pontosvesszővel elválasztani, ennek ellenére nem kötelező, pontosvessző hiányában is végrehajthatóak.
-Nincs szükség PL/SQL parancsok lezárására '/' karakterrel mint SQLDeveloper esetén.
+Nincs szükség PL/SQL utasítások külön lezárására.
 
 \subsection{Diagramok}
 Két különböző típusú diagram lett implementálva a programban, a kör- és oszlopdiagram. A továbbiakban
-ezeknek a szintaxisát részletezem, illetve leírom mikre használhatóak, mivel ezek különböző adatok
+ezeknek a szintaxisa kerül itt részletezésre, illetve az, hogy mikre használhatóak, mivel ezek különböző adatok
 reprezentációjára alkalmasak.
 
 \subsubsection{Kördiagram}
@@ -198,10 +199,10 @@ reprezentációjára alkalmasak.
 \end{figure}
 
 A kördiagram kategorikus adatok megjelenítésére használható, azaz egy adott mennyiség megoszlásának arányát lehet vele
-ábrázolni. Erre láthatunk egy példát a 2.5-ös ábrán. A kört akkora részekre osztjuk, amekkora részt az adott mennyiségek kitesznek az egészből. Akkor érdemes ezt
-a fajta diagramot használni, ha egyes részeknek az egészhez való viszonyát kívánjuk megvizsgálni. Lehetőség lenne egy-egy
-körcikket kirobbantani, azonban ez zavarólag hathat, így erre jelenleg nincs lehetőség a programban. Többet olvashat erről a
-Számítógépes adatfeldolgozás\cite{szamadat} című könyvben, ami az interneten is elérhető.
+ábrázolni. Erre látható egy példa a 2.5-ös ábrán. A kört akkora részekre osztjuk, amekkora részt az adott mennyiségek kitesznek az egészből. Akkor érdemes ezt
+a fajta diagramot használni, ha egyes részeknek az egészhez való viszonyát kívánjuk megvizsgálni. Szokás kördiagramok esetén egy-egy
+körcikk kirobbantásának lehetősége, azonban ez zavarólag hathat, így erre nincs lehetőség a programban. Többet olvashat erről a diagramtípusról a
+Számítógépes adatfeldolgozás\cite{szamadat} című könyvben, ami elérhető az interneten.
 
 Szintaxisa a következő:
 
@@ -214,11 +215,11 @@ Szintaxisa a következő:
   \item Két attribútumosnak kell lennie a lekérdezésnek.
   \item Második attribútuma lehet egy aggregáló függvény eredménye, vagy egy természetes szám. 
   Negatív szám nem használható, hiszen ebben a kontextusban értelmetlen.
-  \item Érdemes csökkenő sorrendben lekérni az elemeket, de ez teljes mértékben a felhasználóra van bízva.
   \item Felesleges attribútum nem szerepelhet a lekérdezésben, azaz ha kettőnél többet tartalmaz, akkor hibát fog adni a program.
 \end{itemize}
 
-A címkékben százalékosan jelennek meg az adatok, így érdemes lehet úgy lekérni az adatokat, hogy ne történjen hiba
+Néhány megjegyzés még ehhez a típushoz:
+Érdemes csökkenő sorrendben lekérni az elemeket, de ez teljes mértékben a felhasználóra van bízva. Valamint a címkékben százalékosan jelennek meg az adatok, így érdemes lehet úgy lekérni az adatokat, hogy ne történjen hiba
 a kerekítés során.
 \newpage
 \subsubsection{Oszlopdiagram}
@@ -232,7 +233,7 @@ a kerekítés során.
 Az oszlopdiagram különböző, ennek ellenére egynemű, időszakosan változó adatok megjelenítésére használható. Erről a típusról láthat egy példát a
 2.6-os ábrán. Ez lehet például egy
 bolt napi nyeresége, ami természetesen nem feltétlen pozitív minden nap, így szükség lehet negatív számok megjelenítése is. Az adatok
-változása így könnyen leolvasható, és összehasonlítható lesz. Erről a diagramtípusról bővebben olvashat Nyesőné Marton Mária
+változása így könnyen leolvasható, és összehasonlítható lesz. Erről a diagramtípusról is bővebben olvashat Nyesőné Marton Mária
 könyvében\cite{szamadat}.
 
 Szintaxisa a következő:
@@ -263,9 +264,7 @@ Számtalan hiba fordulhat elő fő ablak használata közben, ennek ellenére a 
 Röviden most ezeket, és ezeknek a magyarázatát sorolnám fel:
 
 \begin{itemize}
-  \item \textbf{Kérem adjon meg egy felhasználónevet!}: akkor jelenik meg, ha újracsatlakozásnál nem adott meg
-  egy felhasználónevet se. A program automatikusan beírja a jelenleg kapcsolódott felhasználót, csakhogy lehetőség van más felhasználóval való
-  belépésre is.
+  \item \textbf{Kérem adjon meg egy felhasználónevet!}: akkor jelenik meg, ha újracsatlakozásnál törölte a beírt felhasználónevet, és nem adott meg újat. A program automatikusan beírja a jelenleg kapcsolódott felhasználót, csakhogy lehetőség van más felhasználóval való belépésre is.
   \item \textbf{Kérem adja meg jelszavát!}: abban az esetben jelenik meg, ha újrakapcsolódásnál nem adott meg jelszót.
   \item \textbf{Sikertelen kapcsolódás}: akkor, ha valamilyen okból (internetkapcsolat megszűnt, hibás felhasználónév/jelszó páros) nem sikerült
   újra kiépíteni a kapcsolatot az adatbázissal. Egy hibaüzenet is megjelenik, ami a korábban említett Oracle oldalán\cite{oracledocs} megtekinthető.
@@ -276,12 +275,10 @@ Ezeknek a nagy részét lefedi az Oracle oldala\cite{oracledocs}, csakhogy
 vannak a programnak saját hibaüzenetei is, ezeket részletezném:
 
 \begin{itemize}
-  \item \textbf{Kérem hozza létre a PLAN\_TABLE táblát ezen parancs használata előtt!} - a lekérdezési terv létrehozásához szükséges egy PLAN\_TABLE nevű tábla,
-  erről bővebben az Oracle dokumentációjában\cite{oracledocsref} olvashat.
   \item \textbf{Hiba: üres lekérdezést próbált végrehajtani!} - ha kijelölést próbál végrehajtani, de nincs semmi kijelölve, akkor kapja ezt a hibaüzenetet. Illetve ha
   nincs semmi a szerkesztőablakba, és akkor próbál egy utasítást végrehajtani.
-  \item \textbf{Nem GROUP BY lekérdezés.} - ez a hibaüzenet akkor jelenik meg, ha megpróbált egy diagramout létrehozni olyan lekérdezéssel, amelyben nem szerepel \textbf{group by}.
-  \item \textbf{A diagram működéséhez 2 oszlop szükséges.} - akkor jelenik ez meg ha kettőnél kevesebb, vagy több attribútumu lekérdezéssel próbál egy diagramot létrehozni.
+  \item \textbf{Nem GROUP BY lekérdezés.} - ez a hibaüzenet akkor jelenik meg, ha megpróbált egy diagramot létrehozni olyan lekérdezéssel, amelyben nem szerepel \textbf{group by}.
+  \item \textbf{A diagram működéséhez 2 oszlop szükséges.} - akkor jelenik ez meg ha kettőnél kevesebb, vagy több attribútumú lekérdezéssel próbál egy diagramot létrehozni.
 \end{itemize}
 
 \begin{figure}[ht]
@@ -296,7 +293,7 @@ vannak a programnak saját hibaüzenetei is, ezeket részletezném:
   szám, akkor ez a hibaüzenet fogadja.
   \item \textbf{Kérem kördiagramot csak pozitív számokkal használjon!} - mivel a kördiagram adatok egymáshoz való viszonyítását szemlélteti, és az egyes adatok százalékban jelennek meg
   az egészhez viszonyítva, így nem lenne értelme negatív számokkal használni azt. Ez a hibaüzenet erre a hibára figyelmeztet.
-  \item \textbf{Nem támogatott diagram típus: <diagramtípus>} - ez az üzenet akkor jelenik meg ha egy nem támogatott diagramtípust próbál létrehozni.
+  \item \textbf{Nem támogatott diagram típus: $<$diagramtípus$>$} - ez az üzenet akkor jelenik meg ha egy nem támogatott diagramtípust próbál létrehozni.
   Jelenleg támogatott típusok: piechart, barchart.
   \item \textbf{Kérem ezt a diagramtípust kevesebb rekorddal használja.} - abban az esetben ha túl sok rekorddal rendelkező lekérdezéssel próbál egy diagramot készíteni, akkor
   fog ezzel a hibaüzenettel találkozni. Kördiagram esetén húsz, míg oszlopdiagram esetén tíz a maximális rekordszám.
@@ -306,13 +303,5 @@ vannak a programnak saját hibaüzenetei is, ezeket részletezném:
 Ezeknek a hibaüzeneteknek nagy része elkerülhető ha körültekintően hozza létre a diagramokat, illetve hajtja végre a lekérdezéseket. Mielőtt használná a programot
 érdemes elolvasni a 2.3.2-es szakaszban lévő leírást a diagramok használatáról, illetve hasznukról.
 
-DiagramQuery arról is figyelmeztet, hogy ha egy törlés / megtekintés / lekérdezés nem sikerül, és ezen felül az Oracle saját hibakódját is megjeleníti, így pontosan
+QueryCreator arról is figyelmeztet, hogy ha egy törlés / megtekintés / lekérdezés nem sikerül, és ezen felül az Oracle saját hibakódját is megjeleníti, így pontosan
 meg lehet tudni milyen hiba történt az utasítás végrehajtása során.
-
-
-\begin{enumerate}
-  \item beállításaitól
-  \item kapcsolat
-  \item given
-  \item magyar
-\end{enumerate}

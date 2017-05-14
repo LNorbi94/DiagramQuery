@@ -73,6 +73,8 @@ void ConnectWindow::setupLineEdites(QGridLayout* layout)
 
     lineEdit = new QLineEdit();
     layout->addWidget(lineEdit, 1, 2);
+    QIntValidator* validator = new QIntValidator(0, 10000, this);
+    lineEdit->setValidator(validator);
     textFields["port"] = lineEdit;
 
     lineEdit = new QLineEdit();

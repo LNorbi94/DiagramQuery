@@ -51,7 +51,6 @@ QString SqlEditor::extractQuery() noexcept
     query = cursor.selectedText();
     query = query.remove(QRegExp("--[^\xe2\x80\xa9]*"));
     query = query.remove(QRegExp("/\\*([^/]|[^*]/)*\\*/"));
-    query = query.remove('/');
     query = query.simplified();
 
     if (!isPlSql(query))
@@ -134,7 +133,18 @@ bool SqlEditor::makeChart(QString& message
         chart_type = queryInWords->at(2);
     }
 
-    if (groupedBy == queryInWords->end())
+    auto isSelect = std::find(queryInWords->begin()
+                               , queryInWords->end(), "SELECT");
+
+    if (isSelect == queryInWords->end())
+    {
+        message = "Nem egy lekérdezést adott meg paraméterül.";
+    }
+    else if (chart_type != "PIECHART" && chart_type != "BARCHART")
+    {
+        message = "Nem támogatott diagram típus: " + chart_type;
+    }
+    else if (groupedBy == queryInWords->end())
     {
         message = "Nem GROUP BY lekérdezés.";
     }
@@ -154,6 +164,7 @@ bool SqlEditor::makeChart(QString& message
     {
         ++groupedBy;
         *groupedBy = groupedBy->remove(')');
+        *groupedBy = groupedBy->remove(',');
         executed = true;
     }
 
@@ -216,14 +227,13 @@ bool SqlEditor::makeChart(QString& message
         chart->addSeries(series);
         chart->legend()->setAlignment(Qt::AlignBottom);
 
+        QBarCategoryAxis* axis = new QBarCategoryAxis();
+        axis->append({ *groupedBy });
         chart->createDefaultAxes();
+        chart->setAxisX(axis, series);
 
         executed = queryCount <= 10;
         tooMany = !executed;
-    } else
-    {
-        if (message.isEmpty())
-            message = "Nem támogatott diagram típus: " + chart_type;
     }
 
     if (message.isEmpty())
@@ -244,6 +254,8 @@ bool SqlEditor::makeChart(QString& message
     {
         if (tooMany)
             message = "Kérem ezt a diagramtípust kevesebb rekorddal használja.";
+        else if (queryCount == 1)
+            message = "Kérem legalább 2 rekordos lekérdezést használjon.";
         else if (notEnough)
             message = "Üres lekérdezés.";
     }

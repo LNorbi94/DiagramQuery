@@ -133,7 +133,7 @@ QTreeWidget* MainWindowLogic::createExecutionPlan(const int width)
         if (!selectedText.isEmpty())
         {
             selectedText = selectedText.remove(';');
-            query = selectedText;
+            query = selectedText.simplified();
         }
         else
         {
@@ -142,21 +142,18 @@ QTreeWidget* MainWindowLogic::createExecutionPlan(const int width)
         QString explainPlan = QString(
                     "EXPLAIN PLAN SET STATEMENT_ID = 'temp1' FOR %1"
                     ).arg(query);
+        q->exec("DELETE FROM PLAN_TABLE WHERE statement_id = 'temp1'");
         bool success = q->exec(explainPlan);
         if (!success)
         {
-            failMessage = "Kérem hozza létre a PLAN_TABLE táblát ezen parancs használata előtt!";
+            failMessage = q->lastError().text();
             return success;
         }
-        success = q->exec("SELECT cardinality, \
-            lpad(' ',level-1)||operation||' '||options||' '||object_name, \
-            depth, io_cost, cpu_cost, parent_id, id \
-            FROM PLAN_TABLE \
-            CONNECT BY prior id = parent_id \
-            AND prior statement_id = statement_id \
-            START WITH id = 0 \
-            AND statement_id = 'temp1' \
-            ORDER BY depth");
+        success = q->exec("select cardinality, \
+                            operation || ' ' || options || ' ' || object_name, \
+                            cost, \
+                            cpu_cost, parent_id from plan_table WHERE \
+                            statement_id = 'temp1' order by id");
 
         if (success)
         {
@@ -164,19 +161,23 @@ QTreeWidget* MainWindowLogic::createExecutionPlan(const int width)
 
             while (q->next())
             {
-                const QString row = q->value(0).toString();
+                const QString row = q->value(0).isNull() ?
+                    "" : q->value(0).toString();
                 const QString plan = q->value(1).toString().trimmed();
-                const QString ioCost = q->value(3).toString();
-                const QString cpuCost = q->value(4).toString();
-                const int parent_id = q->value(5).isNull() ?
-                    -1 : q->value(5).toInt();
+                const QString ioCost = q->value(2).isNull() ?
+                    "" : q->value(2).toString();
+                const QString cpuCost = q->value(3).isNull() ?
+                    "" : q->value(3).toString();
+                const int parent_id = q->value(4).isNull() ?
+                    -1 : q->value(4).toInt();
                 QTreeWidgetItem* temp = new QTreeWidgetItem(
                     QStringList({ plan, row, ioCost, cpuCost })
                     );
+
                 plans.append(temp);
                 if (parent_id >= 0 && parent_id < plans.size())
                 {
-                    plans.at(parent_id)->addChild(temp);
+                    plans[parent_id]->addChild(temp);
                 }
             }
 

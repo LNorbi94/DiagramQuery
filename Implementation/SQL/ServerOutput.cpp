@@ -19,8 +19,10 @@ ServerOutput::~ServerOutput()
     delete dbmsOutput;
 }
 
-void ServerOutput::writeOutput()
+bool ServerOutput::writeOutput()
 {
+    bool wroteSomething = false;
+    QSqlDatabase::database().transaction();
     db->exec(QString("DECLARE \
             v_status  INTEGER := 0; \
             v_line    VARCHAR2(100); \
@@ -32,16 +34,19 @@ void ServerOutput::writeOutput()
              INSERT INTO %1 VALUES (v_line); \
             END IF; \
             END LOOP; \
-          COMMIT; \
           END;").arg(tableName));
     QSqlQuery q;
     q = db->exec(QString("SELECT * FROM %1").arg(tableName));
+    wroteSomething = q.next();
+    q.previous();
 
     while (q.next())
     {
         const QString output = q.value(0).toString();
         dbmsOutput->appendPlainText(output);
     }
+    QSqlDatabase::database().commit();
 
     clean();
+    return wroteSomething;
 }
